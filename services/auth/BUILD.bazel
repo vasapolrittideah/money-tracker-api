@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "auth_lib",
     srcs = ["main.go"],
-    importpath = "github.com/vasapolrittideah/m/services/auth/cmd/auth",
+    importpath = "github.com/vasapolrittideah/money-tracker-api/services/auth",
     visibility = ["//visibility:public"],
 )
