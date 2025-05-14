@@ -44,8 +44,9 @@ func LoadConfig() (config *Config, err error) {
 		log.Fatal(err)
 	}
 
+	viper.SetConfigType("env")
+	viper.SetConfigName(".env")
 	viper.AddConfigPath(rootDir)
-	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Unable to read in config: %v", err)
