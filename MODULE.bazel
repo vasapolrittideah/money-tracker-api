@@ -1,4 +1,4 @@
-"""Module description goes here."""
+"""This module defines the Bazel dependencies and settings for the money-tracker-api project."""
 
 module(
     name = "money-tracker-api",
