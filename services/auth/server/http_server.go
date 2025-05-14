@@ -60,7 +60,7 @@ func (s *httpServer) Run() {
 	// router := app.Group("/api")
 
 	go func() {
-		if err := app.Listen(":" + s.cfg.ServerConfig.AuthServerHttpUrl); err != nil {
+		if err := app.Listen(":" + s.cfg.Server.AuthServerHttpPort); err != nil {
 			log.Fatalf("Failed to listen and serve application: %v", err)
 		}
 	}()

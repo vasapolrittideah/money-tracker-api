@@ -7,7 +7,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/shared/utils/pathutil"
 )
 
-type JwtConfig struct {
+type SecurityConfig struct {
 	AccessTokenPrivateKey  string `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
 	AccessTokenPublicKey   string `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
 	AccessTokenExpiresIn   string `mapstructure:"ACCESS_TOKEN_EXPIRES_IN"`
@@ -27,15 +27,15 @@ type DatabaseConfig struct {
 }
 
 type ServerConfig struct {
-	AuthServerHttpUrl string `mapstructure:"AUTH_SERVICE_HTTP_URL"`
-	AuthServerGrpcUrl string `mapstructure:"AUTH_SERVICE_GRPC_URL"`
+	AuthServerHttpPort string `mapstructure:"AUTH_SERVICE_HTTP_PORT"`
+	AuthServerGrpcPort string `mapstructure:"AUTH_SERVICE_GRPC_PORT"`
 }
 
 type Config struct {
-	Environment  string `mapstructure:"ENVIRONMENT"`
-	ServerConfig ServerConfig
-	Database     DatabaseConfig
-	Jwt          JwtConfig
+	Environment string         `mapstructure:"ENVIRONMENT"`
+	Server      ServerConfig   `mapstructure:",squash"`
+	Security    SecurityConfig `mapstructure:",squash"`
+	Database    DatabaseConfig `mapstructure:",squash"`
 }
 
 func LoadConfig() (config *Config, err error) {
