@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	middlewareLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/handler"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/repository"
@@ -18,34 +18,38 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/database"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
+	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
+var Logger *log.Logger
 
 type httpServer struct {
 	cfg *config.Config
 }
 
 func NewHttpServer() *httpServer {
+	Logger = logger.NewLogger()
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+		Logger.Fatalf("Failed to load configuration: %v", err)
 	}
 
 	db, err := database.ConnectPostgresDB(&cfg.Database)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		Logger.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	DB = db
-	log.Info("🎉 Connected to database successfully")
+	Logger.Info("🎉 Connected to database successfully")
 
 	entities := []any{
 		&domain.User{},
 	}
 	if err := database.MigratePostgresDB(DB, entities); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
+		Logger.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	return &httpServer{cfg: cfg}
@@ -54,7 +58,7 @@ func NewHttpServer() *httpServer {
 func (s *httpServer) Run() {
 	app := fiber.New()
 
-	loggerConfig := logger.Config{
+	loggerConfig := middlewareLogger.Config{
 		TimeFormat: time.RFC1123Z,
 		TimeZone:   "Asia/Bangkok",
 	}
@@ -72,7 +76,7 @@ func (s *httpServer) Run() {
 
 	app.Use(
 		recover.New(),
-		logger.New(loggerConfig),
+		middlewareLogger.New(loggerConfig),
 		cors.New(corsConfig),
 	)
 
@@ -87,7 +91,7 @@ func (s *httpServer) Run() {
 
 	go func() {
 		if err := app.Listen(":" + s.cfg.Server.AuthServerHttpPort); err != nil {
-			log.Fatalf("Failed to listen and serve application: %v", err)
+			Logger.Fatalf("Failed to listen and serve application: %v", err)
 		}
 	}()
 

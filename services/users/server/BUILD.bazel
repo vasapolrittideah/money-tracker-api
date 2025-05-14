@@ -12,6 +12,7 @@ go_library(
         "//shared/config",
         "//shared/database",
         "//shared/domain",
+        "//shared/logger",
         "@com_github_charmbracelet_log//:log",
         "@com_github_gofiber_fiber_v2//:fiber",
         "@com_github_gofiber_fiber_v2//middleware/cors",
