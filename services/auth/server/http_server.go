@@ -1,13 +1,13 @@
 package server
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -22,7 +22,7 @@ type httpServer struct {
 func NewHttpServer() *httpServer {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Printf("Failed to load configuration: %v", err)
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
 	return &httpServer{cfg: cfg}

@@ -2,15 +2,16 @@ package pathutil
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/charmbracelet/log"
 )
 
 func FindProjectRoot() (string, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	for currentDir != "/" {

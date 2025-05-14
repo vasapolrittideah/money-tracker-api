@@ -1,8 +1,7 @@
 package config
 
 import (
-	"log"
-
+	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 	"github.com/vasapolrittideah/money-tracker-api/shared/utils/pathutil"
 )

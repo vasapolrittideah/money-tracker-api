@@ -1,13 +1,13 @@
 package server
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -30,22 +30,22 @@ type httpServer struct {
 func NewHttpServer() *httpServer {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Panicf("Failed to load configuration: %v", err)
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
 	db, err := database.ConnectPostgresDB(&cfg.Database)
 	if err != nil {
-		log.Panicf("Failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	DB = db
-	log.Println("🎉 Connected to database successfully")
+	log.Info("🎉 Connected to database successfully")
 
 	entities := []any{
 		&domain.User{},
 	}
 	if err := database.MigratePostgresDB(DB, entities); err != nil {
-		log.Panicf("Failed to migrate database: %v", err)
+		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	return &httpServer{cfg: cfg}
