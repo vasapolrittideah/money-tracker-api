@@ -22,8 +22,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-var Logger *log.Logger
+var (
+	DB     *gorm.DB
+	Logger *log.Logger
+)
 
 type httpServer struct {
 	cfg *config.Config
