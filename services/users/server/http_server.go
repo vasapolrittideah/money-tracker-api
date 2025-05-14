@@ -90,7 +90,7 @@ func (s *httpServer) Run() {
 	handler.RegisterAuthHttpHandler(router, s.cfg, authService)
 
 	go func() {
-		if err := app.Listen(":" + s.cfg.Server.AuthServerHttpPort); err != nil {
+		if err := app.Listen(":" + s.cfg.Server.UsersServerHttpPort); err != nil {
 			Logger.Fatalf("Failed to listen and serve application: %v", err)
 		}
 	}()
