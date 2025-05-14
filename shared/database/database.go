@@ -23,5 +23,5 @@ func ConnectPostgresDB(dbConfig *config.DatabaseConfig) (*gorm.DB, error) {
 
 func MigratePostgresDB(db *gorm.DB, models []any) error {
 	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	return db.AutoMigrate(models)
+	return db.AutoMigrate(models...)
 }

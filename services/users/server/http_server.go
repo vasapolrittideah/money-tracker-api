@@ -12,8 +12,16 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/vasapolrittideah/money-tracker-api/services/users/handler"
+	"github.com/vasapolrittideah/money-tracker-api/services/users/repository"
+	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
+	"github.com/vasapolrittideah/money-tracker-api/shared/database"
+	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
+	"gorm.io/gorm"
 )
+
+var DB *gorm.DB
 
 type httpServer struct {
 	cfg *config.Config
@@ -22,7 +30,22 @@ type httpServer struct {
 func NewHttpServer() *httpServer {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Printf("Failed to load configuration: %v", err)
+		log.Panicf("Failed to load configuration: %v", err)
+	}
+
+	db, err := database.ConnectPostgresDB(&cfg.Database)
+	if err != nil {
+		log.Panicf("Failed to connect to database: %v", err)
+	}
+
+	DB = db
+	log.Println("🎉 Connected to database successfully")
+
+	entities := []any{
+		&domain.User{},
+	}
+	if err := database.MigratePostgresDB(DB, entities); err != nil {
+		log.Panicf("Failed to migrate database: %v", err)
 	}
 
 	return &httpServer{cfg: cfg}
@@ -53,11 +76,14 @@ func (s *httpServer) Run() {
 		cors.New(corsConfig),
 	)
 
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusOK).SendString("OK")
+	app.Get("/health", func(ctx *fiber.Ctx) error {
+		return ctx.Status(fiber.StatusOK).SendString("OK")
 	})
 
-	// router := app.Group("/api")
+	router := app.Group("/api")
+
+	authService := service.NewUserService(repository.NewUserRepository(DB), s.cfg)
+	handler.RegisterAuthHttpHandler(router, s.cfg, authService)
 
 	go func() {
 		if err := app.Listen(":" + s.cfg.Server.AuthServerHttpPort); err != nil {

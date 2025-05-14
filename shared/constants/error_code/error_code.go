@@ -1,10 +1,8 @@
-package errors
+package error_code
 
 type ErrorCode string
 
-// ErrorCode constants
 const (
-	Success            ErrorCode = "SUCCESS"
 	InvalidRequest     ErrorCode = "INVALID_REQUEST"
 	Unauthorized       ErrorCode = "UNAUTHORIZED"
 	Forbidden          ErrorCode = "FORBIDDEN"
@@ -18,9 +16,7 @@ const (
 	DatabaseError      ErrorCode = "DATABASE_ERROR"
 )
 
-// Default messages for each error code
 var Messages = map[ErrorCode]string{
-	Success:            "success",
 	InvalidRequest:     "invalid request",
 	Unauthorized:       "unauthorized",
 	Forbidden:          "forbidden",
