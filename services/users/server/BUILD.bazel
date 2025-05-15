@@ -2,7 +2,10 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "server",
-    srcs = ["http_server.go"],
+    srcs = [
+        "grpc_server.go",
+        "http_server.go",
+    ],
     importpath = "github.com/vasapolrittideah/money-tracker-api/services/users/server",
     visibility = ["//visibility:public"],
     deps = [
