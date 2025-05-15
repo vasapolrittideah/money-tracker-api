@@ -1,6 +1,9 @@
 # === General Config ===
 DOCKER_COMPOSE = docker compose
 COMPOSE_FILE = docker-compose.yml
+PROTO_DIR=protobuf
+OUT_DIR=protogen
+PROTO_FILES=$(wildcard $(PROTO_DIR)/*.proto)
 
 # === Docker Compose Targets ===
 .PHONY: up down restart logs build
@@ -43,3 +46,21 @@ bazel-clean:
 init: bazel-gazelle bazel-tidy
 
 all: bazel-gazelle bazel-tidy bazel-build bazel-test
+
+# === Protobuf Targets ===
+.PHONY: proto
+proto:
+	@echo "🔧 Generating protobuf files..."
+	@mkdir -p $(OUT_DIR)
+	@for file in $(PROTO_FILES); do \
+		base=$$(basename $$file .proto); \
+		mkdir -p $(OUT_DIR)/$$base; \
+		protoc \
+			--proto_path=$(PROTO_DIR) $$file \
+			--go_out=$(OUT_DIR)/$$base \
+			--go_opt=paths=source_relative \
+			--go-grpc_out=$(OUT_DIR)/$$base \
+			--go-grpc_opt=paths=source_relative; \
+		echo "✅ Generated: $$file -> $(OUT_DIR)/$$base"; \
+	done
+	
