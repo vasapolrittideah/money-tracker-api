@@ -1,7 +1,7 @@
 export default {
-  "(services|shared)/**/*.go": [
-    () => "go fmt ./...",
-    () => "go vet ./...",
-    () => "golangci-lint run",
-  ],
+  "(services|shared)/**/*.go": (files) =>
+    files.flatMap((file) => [
+      `golangci-lint fmt ${file}`,
+      `golangci-lint run --fix ${file}`,
+    ]),
 };
