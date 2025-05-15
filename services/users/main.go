@@ -16,21 +16,21 @@ func main() {
 
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		logger.L.Fatalf("[USERS] Failed to load configuration: %v", err)
+		logger.Fatal("USERS", "Failed to load configuration: %v", err)
 	}
 
 	db, err := database.ConnectPostgresDB(&cfg.Database)
 	if err != nil {
-		logger.L.Fatalf("[USERS] Failed to connect to database: %v", err)
+		logger.Fatal("USERS", "Failed to connect to database: %v", err)
 	}
 
-	logger.L.Info("[USERS] 🎉 Connected to database successfully")
+	logger.Info("USERS", "🎉 Connected to database successfully")
 
 	entities := []any{
 		&domain.User{},
 	}
 	if err := database.MigratePostgresDB(db, entities); err != nil {
-		logger.L.Fatalf("[USERS] Failed to migrate database: %v", err)
+		logger.Fatal("USERS", "Failed to migrate database: %v", err)
 	}
 
 	httpServer := server.NewUserHttpServer(cfg, db)

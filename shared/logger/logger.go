@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -10,9 +11,21 @@ import (
 )
 
 var (
-	L    *log.Logger
+	l    *log.Logger
 	once sync.Once
 )
+
+var prfixLogStyle = lipgloss.NewStyle().
+	Bold(true).
+	Padding(0, 1, 0, 1).
+	Foreground(lipgloss.Color("0")).
+	Background(lipgloss.Color("#FBF6E9"))
+
+func InitLogger(output *os.File, minLevel log.Level) {
+	once.Do(func() {
+		l = newLogger(output, minLevel)
+	})
+}
 
 func newLogger(output *os.File, minLevel log.Level) *log.Logger {
 	styles := log.DefaultStyles()
@@ -55,14 +68,32 @@ func newLogger(output *os.File, minLevel log.Level) *log.Logger {
 	logger := log.New(output)
 	logger.SetStyles(styles)
 	logger.SetLevel(minLevel)
-	logger.SetReportCaller(true)
 	logger.SetTimeFormat(time.RFC3339)
 
 	return logger
 }
 
-func InitLogger(output *os.File, minLevel log.Level) {
-	once.Do(func() {
-		L = newLogger(output, minLevel)
-	})
+func Debug(service string, format string, args ...any) {
+	message := fmt.Sprintf(format, args...)
+	l.Debug(fmt.Sprintf("%s %s", prfixLogStyle.Render(service), message))
+}
+
+func Info(service string, format string, args ...any) {
+	message := fmt.Sprintf(format, args...)
+	l.Info(fmt.Sprintf("%s %s", prfixLogStyle.Render(service), message))
+}
+
+func Warn(service string, format string, args ...any) {
+	message := fmt.Sprintf(format, args...)
+	l.Warn(fmt.Sprintf("%s %s", prfixLogStyle.Render(service), message))
+}
+
+func Error(service string, format string, args ...any) {
+	message := fmt.Sprintf(format, args...)
+	l.Error(fmt.Sprintf("%s %s", prfixLogStyle.Render(service), message))
+}
+
+func Fatal(service string, format string, args ...any) {
+	message := fmt.Sprintf(format, args...)
+	l.Fatal(fmt.Sprintf("%s %s", prfixLogStyle.Render(service), message))
 }

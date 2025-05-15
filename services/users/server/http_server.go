@@ -65,11 +65,11 @@ func (s *userHttpServer) Run() {
 
 	go func() {
 		if err := app.Listen(":" + s.cfg.Server.UserServerHttpPort); err != nil {
-			logger.L.Fatalf("[USERS] Failed to serve HTTP server: %v", err)
+			logger.Fatal("USERS", "Failed to serve HTTP server: %v", err)
 		}
 	}()
 
-	logger.L.Infof("[USERS] 🚀 HTTP server started on port %v", s.cfg.Server.UserServerHttpPort)
+	logger.Info("USERS", "🚀 HTTP server started on port %v", s.cfg.Server.UserServerHttpPort)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(
