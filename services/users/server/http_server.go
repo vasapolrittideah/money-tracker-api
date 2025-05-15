@@ -88,8 +88,9 @@ func (s *httpServer) Run() {
 
 	router := app.Group("/api")
 
-	authService := service.NewUserService(repository.NewUserRepository(DB), s.cfg)
-	handler.RegisterAuthHttpHandler(router, s.cfg, authService)
+	userService := service.NewUserService(repository.NewUserRepository(DB), s.cfg)
+	userHandler := handler.NewUserHttpHandler(userService, router, s.cfg)
+	userHandler.RegisterRouter()
 
 	go func() {
 		if err := app.Listen(":" + s.cfg.Server.UsersServerHttpPort); err != nil {

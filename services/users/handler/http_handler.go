@@ -9,16 +9,25 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
 )
 
-type AuthHttpHandler struct {
+type UserHttpHandler struct {
 	service service.UserService
+	router  fiber.Router
 	cfg     *config.Config
 }
 
-func NewAuthHttpHandler(service service.UserService, cfg *config.Config) AuthHttpHandler {
-	return AuthHttpHandler{service, cfg}
+func NewUserHttpHandler(service service.UserService, router fiber.Router, cfg *config.Config) UserHttpHandler {
+	return UserHttpHandler{service, router, cfg}
 }
 
-func (h AuthHttpHandler) GetAllUsers(c *fiber.Ctx) error {
+func (h UserHttpHandler) RegisterRouter() {
+	router := h.router.Group("/users")
+
+	router.Get("/", h.GetAllUsers)
+	router.Get("/:id", h.GetUserByID)
+	router.Get("/email/:email", h.GetUserByEmail)
+}
+
+func (h UserHttpHandler) GetAllUsers(c *fiber.Ctx) error {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
@@ -29,7 +38,7 @@ func (h AuthHttpHandler) GetAllUsers(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(users))
 }
 
-func (h AuthHttpHandler) GetUserByID(c *fiber.Ctx) error {
+func (h UserHttpHandler) GetUserByID(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByIDRequest)
 
 	if err := c.BodyParser(payload); err != nil {
@@ -48,7 +57,7 @@ func (h AuthHttpHandler) GetUserByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(user))
 }
 
-func (h AuthHttpHandler) GetUserByEmail(c *fiber.Ctx) error {
+func (h UserHttpHandler) GetUserByEmail(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByEmailRequest)
 
 	if err := c.BodyParser(payload); err != nil {
