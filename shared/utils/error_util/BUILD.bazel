@@ -10,3 +10,15 @@ go_library(
         "@io_gorm_gorm//:gorm",
     ],
 )
+
+go_library(
+    name = "error_util",
+    srcs = ["error_util.go"],
+    importpath = "github.com/vasapolrittideah/money-tracker-api/shared/utils/error_util",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/domain/app_error",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_grpc//codes",
+    ],
+)

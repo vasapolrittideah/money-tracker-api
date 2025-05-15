@@ -6,3 +6,11 @@ go_library(
     importpath = "github.com/vasapolrittideah/money-tracker-api/shared/constants/error_code",
     visibility = ["//visibility:public"],
 )
+
+go_library(
+    name = "app_error",
+    srcs = ["app_error.go"],
+    importpath = "github.com/vasapolrittideah/money-tracker-api/shared/domain/app_error",
+    visibility = ["//visibility:public"],
+    deps = ["@org_golang_google_grpc//codes"],
+)

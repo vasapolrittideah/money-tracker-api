@@ -6,9 +6,8 @@ go_library(
     importpath = "github.com/vasapolrittideah/money-tracker-api/services/users/repository",
     visibility = ["//visibility:public"],
     deps = [
-        "//shared/constants/error_code",
         "//shared/domain",
-        "//shared/utils/databaseutil",
+        "//shared/utils/error_util",
         "@com_github_google_uuid//:uuid",
         "@io_gorm_gorm//:gorm",
     ],

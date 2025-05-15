@@ -3,7 +3,6 @@ syntax = "proto3";
 option go_package = "github.com/vasapolrittideah/money-tracker-api/protogen/users_proto";
 
 import "google/protobuf/timestamp.proto";
-import "common.proto";
 
 service UserService {
   rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse) {}
@@ -31,7 +30,6 @@ message User {
 message GetAllUsersRequest {}
 
 message GetAllUsersResponse {
-  common.Status status = 1;
   repeated User users = 2;
 }
 
@@ -40,7 +38,6 @@ message GetUserByIdRequest {
 }
 
 message GetUserByIdResponse {
-  common.Status status = 1;
   User user = 2;
 }
 
@@ -49,7 +46,6 @@ message GetUserByEmailRequest {
 }
 
 message GetUserByEmailResponse {
-  common.Status status = 1;
   User user = 2;
 }
 
@@ -59,7 +55,7 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  common.Status status = 1;
+  User user = 1;
 }
 
 message UpdateUserRequest {
@@ -69,7 +65,6 @@ message UpdateUserRequest {
 }
 
 message UpdateUserResponse {
-  common.Status status = 1;
   User user = 2;
 }
 
@@ -78,5 +73,5 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-  common.Status status = 1;
+  User user = 1;
 }

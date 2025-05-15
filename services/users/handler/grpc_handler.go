@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/vasapolrittideah/money-tracker-api/protogen/common_proto"
 	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
@@ -12,6 +11,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+// TODO: Improve grpc error handling
 
 type UserGrpcHandler struct {
 	service service.UserService
@@ -43,8 +44,7 @@ func (h *UserGrpcHandler) GetAllUsers(
 	}
 
 	res := &users_proto.GetAllUsersResponse{
-		Status: common_proto.Status_SUCCESS,
-		Users:  protoUsers,
+		Users: protoUsers,
 	}
 	return res, nil
 }
@@ -83,7 +83,7 @@ func (h *UserGrpcHandler) CreateUser(
 	c context.Context,
 	req *users_proto.CreateUserRequest,
 ) (*users_proto.CreateUserResponse, error) {
-	_, err := h.service.CreateUser(domain.User{
+	user, err := h.service.CreateUser(domain.User{
 		FullName: req.FullName,
 		Email:    req.Email,
 	})
@@ -92,7 +92,7 @@ func (h *UserGrpcHandler) CreateUser(
 	}
 
 	res := &users_proto.CreateUserResponse{
-		Status: common_proto.Status_SUCCESS,
+		User: mapUserEntityToProto(user),
 	}
 	return res, nil
 }
@@ -119,13 +119,13 @@ func (h *UserGrpcHandler) DeleteUser(
 	c context.Context,
 	req *users_proto.DeleteUserRequest,
 ) (*users_proto.DeleteUserResponse, error) {
-	_, err := h.service.DeleteUser(uuid.MustParse(req.UserId))
+	user, err := h.service.DeleteUser(uuid.MustParse(req.UserId))
 	if err != nil {
 		return nil, err
 	}
 
 	res := &users_proto.DeleteUserResponse{
-		Status: common_proto.Status_SUCCESS,
+		User: mapUserEntityToProto(user),
 	}
 	return res, nil
 }

@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
-	"github.com/vasapolrittideah/money-tracker-api/shared/utils/pathutil"
+	"github.com/vasapolrittideah/money-tracker-api/shared/utils/path_util"
 )
 
 type SecurityConfig struct {
@@ -40,7 +40,7 @@ type Config struct {
 }
 
 func LoadConfig() (config *Config, err error) {
-	rootDir, err := pathutil.FindProjectRoot()
+	rootDir, err := path_util.FindProjectRoot()
 	if err != nil || rootDir == "" {
 		log.Fatal(err)
 	}

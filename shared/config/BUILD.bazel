@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/vasapolrittideah/money-tracker-api/shared/config",
     visibility = ["//visibility:public"],
     deps = [
-        "//shared/utils/pathutil",
+        "//shared/utils/path_util",
         "@com_github_charmbracelet_log//:log",
         "@com_github_spf13_viper//:viper",
     ],

@@ -5,8 +5,8 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/users/models"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
-	"github.com/vasapolrittideah/money-tracker-api/shared/constants/error_code"
-	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
+	"github.com/vasapolrittideah/money-tracker-api/shared/domain/app_error"
+	"github.com/vasapolrittideah/money-tracker-api/shared/domain/response"
 )
 
 type UserHttpHandler struct {
@@ -30,48 +30,58 @@ func (h UserHttpHandler) RegisterRouter() {
 func (h UserHttpHandler) GetAllUsers(c *fiber.Ctx) error {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
+		appErr := app_error.Assert(err)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			domain.ErrorResponse(error_code.InternalError),
+			response.Error(appErr.Code, appErr.Message),
 		)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(users))
+	return c.Status(fiber.StatusOK).JSON(response.Success(users))
 }
 
 func (h UserHttpHandler) GetUserById(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByIdRequest)
 
 	if err := c.BodyParser(payload); err != nil {
+		appErr := app_error.Assert(err)
+
 		return c.Status(fiber.StatusBadRequest).JSON(
-			domain.ErrorResponse(error_code.InvalidRequest),
+			response.Error(appErr.Code, appErr.Message),
 		)
 	}
 
 	user, err := h.service.GetUserById(payload.Id)
 	if err != nil {
+		appErr := app_error.Assert(err)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			domain.ErrorResponse(error_code.InternalError),
+			response.Error(appErr.Code, appErr.Message),
 		)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(user))
+	return c.Status(fiber.StatusOK).JSON(response.Success(user))
 }
 
 func (h UserHttpHandler) GetUserByEmail(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByEmailRequest)
 
 	if err := c.BodyParser(payload); err != nil {
+		appErr := app_error.Assert(err)
+
 		return c.Status(fiber.StatusBadRequest).JSON(
-			domain.ErrorResponse(error_code.InvalidRequest),
+			response.Error(appErr.Code, appErr.Message),
 		)
 	}
 
 	user, err := h.service.GetUserByEmail(payload.Email)
 	if err != nil {
+		appErr := app_error.Assert(err)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			domain.ErrorResponse(error_code.InternalError),
+			response.Error(appErr.Code, appErr.Message),
 		)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(user))
+	return c.Status(fiber.StatusOK).JSON(response.Success(user))
 }
