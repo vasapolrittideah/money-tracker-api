@@ -8,7 +8,7 @@ import (
 )
 
 type UserService interface {
-	GetAllUsers() ([]domain.User, error)
+	GetAllUsers() ([]*domain.User, error)
 	GetUserByID(uuid.UUID) (domain.User, error)
 	GetUserByEmail(string) (domain.User, error)
 }
@@ -22,7 +22,7 @@ func NewUserService(userRepo repository.UserRepository, cfg *config.Config) User
 	return &userService{userRepo, cfg}
 }
 
-func (s *userService) GetAllUsers() ([]domain.User, error) {
+func (s *userService) GetAllUsers() ([]*domain.User, error) {
 	return s.userRepo.GetAllUsers()
 }
 

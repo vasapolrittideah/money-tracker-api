@@ -2,12 +2,19 @@ package logger
 
 import (
 	"os"
+	"sync"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 )
 
-func NewLogger() *log.Logger {
+var (
+	L    *log.Logger
+	once sync.Once
+)
+
+func newLogger(output *os.File, minLevel log.Level) *log.Logger {
 	styles := log.DefaultStyles()
 
 	styles.Levels[log.DebugLevel] = lipgloss.NewStyle().
@@ -45,8 +52,17 @@ func NewLogger() *log.Logger {
 		Foreground(lipgloss.Color("0")).
 		Bold(true)
 
-	logger := log.New(os.Stderr)
+	logger := log.New(output)
 	logger.SetStyles(styles)
+	logger.SetLevel(minLevel)
+	logger.SetReportCaller(true)
+	logger.SetTimeFormat(time.RFC3339)
 
 	return logger
+}
+
+func InitLogger(output *os.File, minLevel log.Level) {
+	once.Do(func() {
+		L = newLogger(output, minLevel)
+	})
 }

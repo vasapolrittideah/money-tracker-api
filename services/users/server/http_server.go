@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	middlewareLogger "github.com/gofiber/fiber/v2/middleware/logger"
@@ -16,48 +15,20 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/users/repository"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
-	"github.com/vasapolrittideah/money-tracker-api/shared/database"
-	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
 	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
 	"gorm.io/gorm"
 )
 
-var (
-	DB     *gorm.DB
-	Logger *log.Logger
-)
-
-type httpServer struct {
+type userHttpServer struct {
 	cfg *config.Config
+	db  *gorm.DB
 }
 
-func NewHttpServer() *httpServer {
-	Logger = logger.NewLogger()
-
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		Logger.Fatalf("Failed to load configuration: %v", err)
-	}
-
-	db, err := database.ConnectPostgresDB(&cfg.Database)
-	if err != nil {
-		Logger.Fatalf("Failed to connect to database: %v", err)
-	}
-
-	DB = db
-	Logger.Info("🎉 Connected to database successfully")
-
-	entities := []any{
-		&domain.User{},
-	}
-	if err := database.MigratePostgresDB(DB, entities); err != nil {
-		Logger.Fatalf("Failed to migrate database: %v", err)
-	}
-
-	return &httpServer{cfg: cfg}
+func NewUserHttpServer(cfg *config.Config, db *gorm.DB) *userHttpServer {
+	return &userHttpServer{cfg: cfg, db: db}
 }
 
-func (s *httpServer) Run() {
+func (s *userHttpServer) Run() {
 	app := fiber.New()
 
 	loggerConfig := middlewareLogger.Config{
@@ -88,15 +59,17 @@ func (s *httpServer) Run() {
 
 	router := app.Group("/api")
 
-	userService := service.NewUserService(repository.NewUserRepository(DB), s.cfg)
+	userService := service.NewUserService(repository.NewUserRepository(s.db), s.cfg)
 	userHandler := handler.NewUserHttpHandler(userService, router, s.cfg)
 	userHandler.RegisterRouter()
 
 	go func() {
-		if err := app.Listen(":" + s.cfg.Server.UsersServerHttpPort); err != nil {
-			Logger.Fatalf("Failed to listen and serve application: %v", err)
+		if err := app.Listen(":" + s.cfg.Server.UserServerHttpPort); err != nil {
+			logger.L.Fatalf("[USERS] Failed to serve HTTP server: %v", err)
 		}
 	}()
+
+	logger.L.Infof("[USERS] 🚀 HTTP server started on port %v", s.cfg.Server.UserServerHttpPort)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(

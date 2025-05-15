@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = "github.com/vasapolrittideah/money-tracker-api/services/users/proto";
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+  rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse) {}
+  rpc GetUserByID (GetUserByIDRequest) returns (GetUserByIDResponse) {}
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (GetUserByEmailResponse) {}
+}
+
+message User {
+  string id = 1;
+  string fullName = 2;
+  string email = 3;
+  google.protobuf.Timestamp createdAt = 4;
+  google.protobuf.Timestamp updatedAt = 5;
+  google.protobuf.Timestamp lastSignInAt = 6;
+}
+
+message GetAllUsersRequest {}
+
+message GetAllUsersResponse {
+  repeated User users = 1;
+}
+
+message GetUserByIDRequest {
+  string userID = 1;
+}
+
+message GetUserByIDResponse {
+  User user = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserByEmailResponse {
+  User user = 1;
+}

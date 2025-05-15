@@ -5,7 +5,14 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/vasapolrittideah/money-tracker-api/services/users",
     visibility = ["//visibility:private"],
-    deps = ["//services/users/server"],
+    deps = [
+        "//services/users/server",
+        "//shared/config",
+        "//shared/database",
+        "//shared/domain",
+        "//shared/logger",
+        "@com_github_charmbracelet_log//:log",
+    ],
 )
 
 go_binary(

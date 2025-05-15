@@ -26,10 +26,10 @@ type DatabaseConfig struct {
 }
 
 type ServerConfig struct {
-	AuthServerHttpPort  string `mapstructure:"AUTH_SERVICE_HTTP_PORT"`
-	AuthServerGrpcPort  string `mapstructure:"AUTH_SERVICE_GRPC_PORT"`
-	UsersServerHttpPort string `mapstructure:"USERS_SERVICE_HTTP_PORT"`
-	UsersServerGrpcPort string `mapstructure:"USERS_SERVICE_GRPC_PORT"`
+	AuthServerHttpPort string `mapstructure:"AUTH_SERVICE_HTTP_PORT"`
+	AuthServerGrpcPort string `mapstructure:"AUTH_SERVICE_GRPC_PORT"`
+	UserServerHttpPort string `mapstructure:"USER_SERVICE_HTTP_PORT"`
+	UserServerGrpcPort string `mapstructure:"USER_SERVICE_GRPC_PORT"`
 }
 
 type Config struct {

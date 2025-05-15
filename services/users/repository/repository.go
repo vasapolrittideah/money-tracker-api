@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	GetAllUsers() ([]domain.User, error)
+	GetAllUsers() ([]*domain.User, error)
 	GetUserByID(uuid.UUID) (domain.User, error)
 	GetUserByEmail(string) (domain.User, error)
 	CreateUser(domain.User) (domain.User, error)
@@ -27,8 +27,8 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return userRepository{db}
 }
 
-func (r userRepository) GetAllUsers() ([]domain.User, error) {
-	var users []domain.User
+func (r userRepository) GetAllUsers() ([]*domain.User, error) {
+	var users []*domain.User
 	if err := r.db.Find(&users).Error; err != nil {
 		return nil, fmt.Errorf("%s: %s", error_code.DatabaseError, err.Error())
 	}

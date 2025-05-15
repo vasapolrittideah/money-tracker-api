@@ -9,6 +9,7 @@
   },
   "scripts": {
     "prepare": "husky",
-    "lint": "golangci-lint run ./..."
+    "lint": "golangci-lint run --fix ./...",
+    "fmt": "golangci-lint fmt"
   }
 }

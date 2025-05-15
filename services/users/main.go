@@ -1,8 +1,41 @@
 package main
 
-import "github.com/vasapolrittideah/money-tracker-api/services/users/server"
+import (
+	"os"
+
+	"github.com/charmbracelet/log"
+	"github.com/vasapolrittideah/money-tracker-api/services/users/server"
+	"github.com/vasapolrittideah/money-tracker-api/shared/config"
+	"github.com/vasapolrittideah/money-tracker-api/shared/database"
+	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
+	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
+)
 
 func main() {
-	httpServer := server.NewHttpServer()
-	httpServer.Run()
+	logger.InitLogger(os.Stderr, log.DebugLevel)
+
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		logger.L.Fatalf("[USERS] Failed to load configuration: %v", err)
+	}
+
+	db, err := database.ConnectPostgresDB(&cfg.Database)
+	if err != nil {
+		logger.L.Fatalf("[USERS] Failed to connect to database: %v", err)
+	}
+
+	logger.L.Info("[USERS] 🎉 Connected to database successfully")
+
+	entities := []any{
+		&domain.User{},
+	}
+	if err := database.MigratePostgresDB(db, entities); err != nil {
+		logger.L.Fatalf("[USERS] Failed to migrate database: %v", err)
+	}
+
+	httpServer := server.NewUserHttpServer(cfg, db)
+	go httpServer.Run()
+
+	grpcServer := server.NewUserGrpcServer(cfg, db)
+	grpcServer.Run()
 }
