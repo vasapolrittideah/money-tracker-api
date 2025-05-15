@@ -53,14 +53,15 @@ proto:
 	@echo "🔧 Generating protobuf files..."
 	@mkdir -p $(OUT_DIR)
 	@for file in $(PROTO_FILES); do \
-		base=$$(basename $$file .proto); \
+		base=$$(basename $$file .proto)_proto; \
 		mkdir -p $(OUT_DIR)/$$base; \
 		protoc \
-			--proto_path=$(PROTO_DIR) $$file \
+			--proto_path=$(PROTO_DIR) \
 			--go_out=$(OUT_DIR)/$$base \
 			--go_opt=paths=source_relative \
 			--go-grpc_out=$(OUT_DIR)/$$base \
-			--go-grpc_opt=paths=source_relative; \
+			--go-grpc_opt=paths=source_relative \
+			$$file; \
 		echo "✅ Generated: $$file -> $(OUT_DIR)/$$base"; \
 	done
 	

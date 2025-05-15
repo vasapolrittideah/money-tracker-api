@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	proto "github.com/vasapolrittideah/money-tracker-api/protogen/users"
+	"github.com/vasapolrittideah/money-tracker-api/protogen/common_proto"
+	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
@@ -14,7 +15,7 @@ import (
 
 type UserGrpcHandler struct {
 	service service.UserService
-	proto.UnimplementedUserServiceServer
+	users_proto.UnimplementedUserServiceServer
 	cfg *config.Config
 }
 
@@ -24,39 +25,40 @@ func NewUserGrpcHandler(grpc *grpc.Server, service service.UserService, cfg *con
 		cfg:     cfg,
 	}
 
-	proto.RegisterUserServiceServer(grpc, handler)
+	users_proto.RegisterUserServiceServer(grpc, handler)
 }
 
 func (h *UserGrpcHandler) GetAllUsers(
 	c context.Context,
-	req *proto.GetAllUsersRequest,
-) (*proto.GetAllUsersResponse, error) {
+	req *users_proto.GetAllUsersRequest,
+) (*users_proto.GetAllUsersResponse, error) {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}
 
-	var protoUsers []*proto.User
+	var protoUsers []*users_proto.User
 	for _, user := range users {
 		protoUsers = append(protoUsers, mapUserEntityToProto(*user))
 	}
 
-	res := &proto.GetAllUsersResponse{
-		Users: protoUsers,
+	res := &users_proto.GetAllUsersResponse{
+		Status: common_proto.Status_SUCCESS,
+		Users:  protoUsers,
 	}
 	return res, nil
 }
 
-func (h *UserGrpcHandler) GetUserByID(
+func (h *UserGrpcHandler) GetUserById(
 	c context.Context,
-	req *proto.GetUserByIDRequest,
-) (*proto.GetUserByIDResponse, error) {
-	user, err := h.service.GetUserByID(uuid.MustParse(req.UserID))
+	req *users_proto.GetUserByIdRequest,
+) (*users_proto.GetUserByIdResponse, error) {
+	user, err := h.service.GetUserById(uuid.MustParse(req.UserId))
 	if err != nil {
 		return nil, err
 	}
 
-	res := &proto.GetUserByIDResponse{
+	res := &users_proto.GetUserByIdResponse{
 		User: mapUserEntityToProto(user),
 	}
 	return res, nil
@@ -64,22 +66,73 @@ func (h *UserGrpcHandler) GetUserByID(
 
 func (h *UserGrpcHandler) GetUserByEmail(
 	c context.Context,
-	req *proto.GetUserByEmailRequest,
-) (*proto.GetUserByEmailResponse, error) {
+	req *users_proto.GetUserByEmailRequest,
+) (*users_proto.GetUserByEmailResponse, error) {
 	user, err := h.service.GetUserByEmail(req.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &proto.GetUserByEmailResponse{
+	res := &users_proto.GetUserByEmailResponse{
 		User: mapUserEntityToProto(user),
 	}
 	return res, nil
 }
 
-func mapUserEntityToProto(user domain.User) *proto.User {
-	return &proto.User{
-		Id:           uuid.UUID(user.ID).String(),
+func (h *UserGrpcHandler) CreateUser(
+	c context.Context,
+	req *users_proto.CreateUserRequest,
+) (*users_proto.CreateUserResponse, error) {
+	_, err := h.service.CreateUser(domain.User{
+		FullName: req.FullName,
+		Email:    req.Email,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &users_proto.CreateUserResponse{
+		Status: common_proto.Status_SUCCESS,
+	}
+	return res, nil
+}
+
+func (h *UserGrpcHandler) UpdateUser(
+	c context.Context,
+	req *users_proto.UpdateUserRequest,
+) (*users_proto.UpdateUserResponse, error) {
+	user, err := h.service.UpdateUser(domain.User{
+		FullName: req.FullName,
+		Email:    req.Email,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &users_proto.UpdateUserResponse{
+		User: mapUserEntityToProto(user),
+	}
+	return res, nil
+}
+
+func (h *UserGrpcHandler) DeleteUser(
+	c context.Context,
+	req *users_proto.DeleteUserRequest,
+) (*users_proto.DeleteUserResponse, error) {
+	_, err := h.service.DeleteUser(uuid.MustParse(req.UserId))
+	if err != nil {
+		return nil, err
+	}
+
+	res := &users_proto.DeleteUserResponse{
+		Status: common_proto.Status_SUCCESS,
+	}
+	return res, nil
+}
+
+func mapUserEntityToProto(user domain.User) *users_proto.User {
+	return &users_proto.User{
+		Id:           uuid.UUID(user.Id).String(),
 		FullName:     user.FullName,
 		Email:        user.Email,
 		CreatedAt:    timestamppb.New(user.CreatedAt),

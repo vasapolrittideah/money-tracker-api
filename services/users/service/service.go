@@ -9,8 +9,11 @@ import (
 
 type UserService interface {
 	GetAllUsers() ([]*domain.User, error)
-	GetUserByID(uuid.UUID) (domain.User, error)
+	GetUserById(uuid.UUID) (domain.User, error)
 	GetUserByEmail(string) (domain.User, error)
+	CreateUser(domain.User) (domain.User, error)
+	UpdateUser(domain.User) (domain.User, error)
+	DeleteUser(uuid.UUID) (domain.User, error)
 }
 
 type userService struct {
@@ -26,10 +29,22 @@ func (s *userService) GetAllUsers() ([]*domain.User, error) {
 	return s.userRepo.GetAllUsers()
 }
 
-func (s *userService) GetUserByID(id uuid.UUID) (domain.User, error) {
-	return s.userRepo.GetUserByID(id)
+func (s *userService) GetUserById(id uuid.UUID) (domain.User, error) {
+	return s.userRepo.GetUserById(id)
 }
 
 func (s *userService) GetUserByEmail(email string) (domain.User, error) {
 	return s.userRepo.GetUserByEmail(email)
+}
+
+func (s *userService) CreateUser(user domain.User) (domain.User, error) {
+	return s.userRepo.CreateUser(user)
+}
+
+func (s *userService) UpdateUser(user domain.User) (domain.User, error) {
+	return s.userRepo.UpdateUser(user)
+}
+
+func (s *userService) DeleteUser(id uuid.UUID) (domain.User, error) {
+	return s.userRepo.DeleteUser(id)
 }

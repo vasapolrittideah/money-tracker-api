@@ -12,10 +12,10 @@ import (
 
 type UserRepository interface {
 	GetAllUsers() ([]*domain.User, error)
-	GetUserByID(uuid.UUID) (domain.User, error)
+	GetUserById(uuid.UUID) (domain.User, error)
 	GetUserByEmail(string) (domain.User, error)
 	CreateUser(domain.User) (domain.User, error)
-	UpdateUser(uuid.UUID, domain.User) (domain.User, error)
+	UpdateUser(domain.User) (domain.User, error)
 	DeleteUser(uuid.UUID) (domain.User, error)
 }
 
@@ -36,7 +36,7 @@ func (r userRepository) GetAllUsers() ([]*domain.User, error) {
 	return users, nil
 }
 
-func (r userRepository) GetUserByID(id uuid.UUID) (domain.User, error) {
+func (r userRepository) GetUserById(id uuid.UUID) (domain.User, error) {
 	var user domain.User
 	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
 		return user, databaseutil.HandleRecordNotFoundError(err)
@@ -62,13 +62,13 @@ func (r userRepository) CreateUser(user domain.User) (domain.User, error) {
 	return user, nil
 }
 
-func (r userRepository) UpdateUser(id uuid.UUID, newData domain.User) (domain.User, error) {
+func (r userRepository) UpdateUser(newUserData domain.User) (domain.User, error) {
 	var user domain.User
-	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
+	if err := r.db.First(&user, "id = ?", newUserData.Id).Error; err != nil {
 		return user, databaseutil.HandleRecordNotFoundError(err)
 	}
 
-	if err := r.db.Model(&user).Updates(newData).Error; err != nil {
+	if err := r.db.Model(&user).Updates(newUserData.Id).Error; err != nil {
 		return user, databaseutil.HandleGeneralDatabaseError(err)
 	}
 

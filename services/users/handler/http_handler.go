@@ -23,7 +23,7 @@ func (h UserHttpHandler) RegisterRouter() {
 	router := h.router.Group("/users")
 
 	router.Get("/", h.GetAllUsers)
-	router.Get("/:id", h.GetUserByID)
+	router.Get("/:id", h.GetUserById)
 	router.Get("/email/:email", h.GetUserByEmail)
 }
 
@@ -38,8 +38,8 @@ func (h UserHttpHandler) GetAllUsers(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(domain.SuccessResponse(users))
 }
 
-func (h UserHttpHandler) GetUserByID(c *fiber.Ctx) error {
-	payload := new(models.GetOrderByIDRequest)
+func (h UserHttpHandler) GetUserById(c *fiber.Ctx) error {
+	payload := new(models.GetOrderByIdRequest)
 
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
@@ -47,7 +47,7 @@ func (h UserHttpHandler) GetUserByID(c *fiber.Ctx) error {
 		)
 	}
 
-	user, err := h.service.GetUserByID(payload.ID)
+	user, err := h.service.GetUserById(payload.Id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
 			domain.ErrorResponse(error_code.InternalError),
