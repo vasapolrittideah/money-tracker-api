@@ -3,9 +3,9 @@ package models
 import "github.com/vasapolrittideah/money-tracker-api/shared/domain"
 
 type SignUpRequest struct {
-	FullName string `json:"full_name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	FullName string `json:"full_name" validate:"required"`
+	Email    string `json:"email"     validate:"required,email"`
+	Password string `json:"password"  validate:"required"`
 }
 
 type SignUpResponse struct {
@@ -13,8 +13,8 @@ type SignUpResponse struct {
 }
 
 type SignInRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email"    validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 type SignInResponse struct {

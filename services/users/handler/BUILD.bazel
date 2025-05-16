@@ -16,6 +16,7 @@ go_library(
         "//shared/domain",
         "//shared/domain/response",
         "//shared/mapper",
+        "//shared/validator",
         "@com_github_gofiber_fiber_v2//:fiber",
         "@com_github_google_uuid//:uuid",
         "@org_golang_google_grpc//:grpc",

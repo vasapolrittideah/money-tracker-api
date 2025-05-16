@@ -9,6 +9,7 @@ go_library(
         "//services/auth/server",
         "//shared/config",
         "//shared/logger",
+        "//shared/validator",
         "@com_github_charmbracelet_log//:log",
     ],
 )

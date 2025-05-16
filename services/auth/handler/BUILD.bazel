@@ -10,6 +10,7 @@ go_library(
         "//services/auth/service",
         "//shared/config",
         "//shared/domain/response",
+        "//shared/validator",
         "@com_github_gofiber_fiber_v2//:fiber",
         "@org_golang_google_grpc//codes",
     ],

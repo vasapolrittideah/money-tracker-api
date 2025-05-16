@@ -6,6 +6,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain/response"
+	"github.com/vasapolrittideah/money-tracker-api/shared/validator"
 	"google.golang.org/grpc/codes"
 )
 
@@ -39,6 +40,12 @@ func (h AuthHttpHandler) SignUp(c *fiber.Ctx) error {
 		)
 	}
 
+	if errs := validator.ValidateStruct(payload); len(errs) != 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.ValidationFailed(errs),
+		)
+	}
+
 	res, err := h.service.SignUp(*payload)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(
@@ -55,6 +62,12 @@ func (h AuthHttpHandler) SignIn(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			response.Error(codes.InvalidArgument, err.Error()),
+		)
+	}
+
+	if errs := validator.ValidateStruct(payload); len(errs) != 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.ValidationFailed(errs),
 		)
 	}
 
