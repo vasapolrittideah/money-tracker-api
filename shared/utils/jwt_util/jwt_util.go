@@ -66,6 +66,20 @@ func ValidateJwt(token string, publicKey string) (*jwt.Token, error) {
 	return parsed, nil
 }
 
+func ParseToken(tokenString, tokenPublicKey string) (*jwt.MapClaims, error) {
+	token, err := ValidateJwt(tokenString, tokenPublicKey)
+	if err != nil {
+		return nil, app_error.New(codes.Internal, fmt.Errorf("token is invalid or has been expired"))
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, app_error.New(codes.Unauthenticated, fmt.Errorf("token is invalid"))
+	}
+
+	return &claims, nil
+}
+
 func HashRefreshToken(refreshToken string) (string, error) {
 	argon := argon2.DefaultConfig()
 

@@ -17,6 +17,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
+	"github.com/vasapolrittideah/money-tracker-api/shared/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -70,7 +71,8 @@ func (s *httpServer) Run() {
 	router := app.Group("/api")
 
 	authService := service.NewAuthService(userClient, s.cfg)
-	authHandler := handler.NewAuthHttpHandler(authService, router, s.cfg)
+	coreMiddleware := middleware.NewCoreMiddleware(s.cfg)
+	authHandler := handler.NewAuthHttpHandler(authService, coreMiddleware, router, s.cfg)
 	authHandler.RegisterRouter()
 
 	go func() {

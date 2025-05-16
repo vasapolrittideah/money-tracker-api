@@ -6,22 +6,25 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain/response"
+	"github.com/vasapolrittideah/money-tracker-api/shared/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/shared/validator"
 	"google.golang.org/grpc/codes"
 )
 
 type AuthHttpHandler struct {
-	service service.AuthService
-	router  fiber.Router
-	cfg     *config.Config
+	service    service.AuthService
+	middleware middleware.CoreMiddleware
+	router     fiber.Router
+	cfg        *config.Config
 }
 
 func NewAuthHttpHandler(
 	service service.AuthService,
+	middleware middleware.CoreMiddleware,
 	router fiber.Router,
 	cfg *config.Config,
 ) AuthHttpHandler {
-	return AuthHttpHandler{service, router, cfg}
+	return AuthHttpHandler{service, middleware, router, cfg}
 }
 
 func (h AuthHttpHandler) RegisterRouter() {
