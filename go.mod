@@ -14,7 +14,7 @@ require (
 	github.com/matthewhartstonge/argon2 v1.3.1
 	github.com/spf13/viper v1.20.1
 	google.golang.org/grpc v1.67.3
-	google.golang.org/protobuf v1.36.3
+	google.golang.org/protobuf v1.36.6
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.26.1
 )
