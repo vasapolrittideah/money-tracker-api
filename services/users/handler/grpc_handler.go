@@ -9,10 +9,9 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-// TODO: Improve grpc error handling
 
 type UserGrpcHandler struct {
 	service service.UserService
@@ -35,7 +34,7 @@ func (h *UserGrpcHandler) GetAllUsers(
 ) (*users_proto.GetAllUsersResponse, error) {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	var protoUsers []*users_proto.User
@@ -55,7 +54,7 @@ func (h *UserGrpcHandler) GetUserById(
 ) (*users_proto.GetUserByIdResponse, error) {
 	user, err := h.service.GetUserById(uuid.MustParse(req.UserId))
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.GetUserByIdResponse{
@@ -70,7 +69,7 @@ func (h *UserGrpcHandler) GetUserByEmail(
 ) (*users_proto.GetUserByEmailResponse, error) {
 	user, err := h.service.GetUserByEmail(req.Email)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.GetUserByEmailResponse{
@@ -88,7 +87,7 @@ func (h *UserGrpcHandler) CreateUser(
 		Email:    req.Email,
 	})
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.CreateUserResponse{
@@ -106,7 +105,7 @@ func (h *UserGrpcHandler) UpdateUser(
 		Email:    req.Email,
 	})
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.UpdateUserResponse{
@@ -121,7 +120,7 @@ func (h *UserGrpcHandler) DeleteUser(
 ) (*users_proto.DeleteUserResponse, error) {
 	user, err := h.service.DeleteUser(uuid.MustParse(req.UserId))
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.DeleteUserResponse{
