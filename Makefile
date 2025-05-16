@@ -31,6 +31,9 @@ bazel-gazelle:
 bazel-build:
 	bazel build //...
 
+bazel-get:
+	bazel run @rules_go//go -- get
+
 bazel-tidy:
 	bazel run @rules_go//go -- mod tidy -v
 

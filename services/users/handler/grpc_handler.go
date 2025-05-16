@@ -8,9 +8,9 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
+	"github.com/vasapolrittideah/money-tracker-api/shared/mapper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UserGrpcHandler struct {
@@ -39,7 +39,7 @@ func (h *UserGrpcHandler) GetAllUsers(
 
 	var protoUsers []*users_proto.User
 	for _, user := range users {
-		protoUsers = append(protoUsers, mapUserEntityToProto(*user))
+		protoUsers = append(protoUsers, mapper.MapUserEntityToProto(*user))
 	}
 
 	res := &users_proto.GetAllUsersResponse{
@@ -58,7 +58,7 @@ func (h *UserGrpcHandler) GetUserById(
 	}
 
 	res := &users_proto.GetUserByIdResponse{
-		User: mapUserEntityToProto(user),
+		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
 }
@@ -73,7 +73,7 @@ func (h *UserGrpcHandler) GetUserByEmail(
 	}
 
 	res := &users_proto.GetUserByEmailResponse{
-		User: mapUserEntityToProto(user),
+		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
 }
@@ -83,15 +83,16 @@ func (h *UserGrpcHandler) CreateUser(
 	req *users_proto.CreateUserRequest,
 ) (*users_proto.CreateUserResponse, error) {
 	user, err := h.service.CreateUser(domain.User{
-		FullName: req.FullName,
-		Email:    req.Email,
+		FullName:       req.FullName,
+		Email:          req.Email,
+		HashedPassword: req.HashedPassword,
 	})
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.CreateUserResponse{
-		User: mapUserEntityToProto(user),
+		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
 }
@@ -101,15 +102,15 @@ func (h *UserGrpcHandler) UpdateUser(
 	req *users_proto.UpdateUserRequest,
 ) (*users_proto.UpdateUserResponse, error) {
 	user, err := h.service.UpdateUser(domain.User{
-		FullName: req.FullName,
-		Email:    req.Email,
+		FullName: req.User.FullName,
+		Email:    req.User.Email,
 	})
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
 	res := &users_proto.UpdateUserResponse{
-		User: mapUserEntityToProto(user),
+		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
 }
@@ -124,18 +125,7 @@ func (h *UserGrpcHandler) DeleteUser(
 	}
 
 	res := &users_proto.DeleteUserResponse{
-		User: mapUserEntityToProto(user),
+		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
-}
-
-func mapUserEntityToProto(user domain.User) *users_proto.User {
-	return &users_proto.User{
-		Id:           uuid.UUID(user.Id).String(),
-		FullName:     user.FullName,
-		Email:        user.Email,
-		CreatedAt:    timestamppb.New(user.CreatedAt),
-		UpdatedAt:    timestamppb.New(user.UpdatedAt),
-		LastSignInAt: timestamppb.New(user.LastSignInAt),
-	}
 }

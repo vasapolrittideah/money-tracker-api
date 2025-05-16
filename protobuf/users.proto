@@ -17,12 +17,15 @@ message User {
   string id = 1;
   string full_name = 2;
   string email = 3;
-  google.protobuf.Timestamp createdAt = 4;
-  google.protobuf.Timestamp updatedAt = 5;
-  google.protobuf.Timestamp last_sign_in_at = 6;
+  bool verified = 4;
+  google.protobuf.Timestamp createdAt =5;
+  google.protobuf.Timestamp updatedAt = 6;
+  google.protobuf.Timestamp last_sign_in_at = 7;
+  string hashed_password = 8;
+  string hashed_refresh_token = 9;
 
-  // reserved 7 to avoid conflict in the future
-  reserved 7;
+  // reserved 10 to avoid conflict in the future
+  reserved 10;
 }
 
 // Requests and Responses
@@ -52,6 +55,7 @@ message GetUserByEmailResponse {
 message CreateUserRequest {
   string full_name = 1;
   string email = 2;
+  string hashed_password = 3;
 }
 
 message CreateUserResponse {
@@ -59,9 +63,7 @@ message CreateUserResponse {
 }
 
 message UpdateUserRequest {
-  string user_id = 1;
-  string full_name = 2;
-  string email = 3;
+  User user = 1;
 }
 
 message UpdateUserResponse {

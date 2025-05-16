@@ -1,20 +1,22 @@
 package config
 
 import (
+	"time"
+
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 	"github.com/vasapolrittideah/money-tracker-api/shared/utils/path_util"
 )
 
 type SecurityConfig struct {
-	AccessTokenPrivateKey  string `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
-	AccessTokenPublicKey   string `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
-	AccessTokenExpiresIn   string `mapstructure:"ACCESS_TOKEN_EXPIRES_IN"`
-	AccessTokenMaxAge      string `mapstructure:"ACCESS_TOKEN_MAX_AGE"`
-	RefreshTokenPrivateKey string `mapstructure:"REFRESH_TOKEN_PRIVATE_KEY"`
-	RefreshTokenPublicKey  string `mapstructure:"REFRESH_TOKEN_PUBLIC_KEY"`
-	RefreshTokenExpiresIn  string `mapstructure:"REFRESH_TOKEN_EXPIRES_IN"`
-	RefreshTokenMaxAge     string `mapstructure:"REFRESH_TOKEN_MAX_AGE"`
+	AccessTokenPrivateKey  string        `mapstructure:"ACCESS_TOKEN_PRIVATE_KEY"`
+	AccessTokenPublicKey   string        `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY"`
+	AccessTokenExpiresIn   time.Duration `mapstructure:"ACCESS_TOKEN_EXPIRES_IN"`
+	AccessTokenMaxAge      string        `mapstructure:"ACCESS_TOKEN_MAX_AGE"`
+	RefreshTokenPrivateKey string        `mapstructure:"REFRESH_TOKEN_PRIVATE_KEY"`
+	RefreshTokenPublicKey  string        `mapstructure:"REFRESH_TOKEN_PUBLIC_KEY"`
+	RefreshTokenExpiresIn  time.Duration `mapstructure:"REFRESH_TOKEN_EXPIRES_IN"`
+	RefreshTokenMaxAge     string        `mapstructure:"REFRESH_TOKEN_MAX_AGE"`
 }
 
 type DatabaseConfig struct {

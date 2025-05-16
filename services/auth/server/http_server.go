@@ -1,37 +1,38 @@
 package server
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	middlewareLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
+	"github.com/vasapolrittideah/money-tracker-api/services/auth/handler"
+	"github.com/vasapolrittideah/money-tracker-api/services/auth/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
+	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type httpServer struct {
 	cfg *config.Config
 }
 
-func NewHttpServer() *httpServer {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
-	}
-
+func NewAuthHttpServer(cfg *config.Config) *httpServer {
 	return &httpServer{cfg: cfg}
 }
 
 func (s *httpServer) Run() {
 	app := fiber.New()
 
-	loggerConfig := logger.Config{
+	loggerConfig := middlewareLogger.Config{
 		TimeFormat: time.RFC1123Z,
 		TimeZone:   "Asia/Bangkok",
 	}
@@ -49,7 +50,7 @@ func (s *httpServer) Run() {
 
 	app.Use(
 		recover.New(),
-		logger.New(loggerConfig),
+		middlewareLogger.New(loggerConfig),
 		cors.New(corsConfig),
 	)
 
@@ -57,13 +58,28 @@ func (s *httpServer) Run() {
 		return c.Status(fiber.StatusOK).SendString("OK")
 	})
 
-	// router := app.Group("/api")
+	conn := newUserClient(s.cfg)
+	defer func() {
+		cerr := conn.Close()
+		if cerr != nil {
+			logger.Error("AUTH", "Failed to close connection: %v", cerr)
+		}
+	}()
+
+	userClient := users_proto.NewUserServiceClient(conn)
+	router := app.Group("/api")
+
+	authService := service.NewAuthService(userClient, s.cfg)
+	authHandler := handler.NewAuthHttpHandler(authService, router, s.cfg)
+	authHandler.RegisterRouter()
 
 	go func() {
 		if err := app.Listen(":" + s.cfg.Server.AuthServerHttpPort); err != nil {
-			log.Fatalf("Failed to listen and serve application: %v", err)
+			logger.Fatal("AUTH", "Failed to listen and serve application: %v", err)
 		}
 	}()
+
+	logger.Info("AUTH", "🚀 HTTP server started on port %v", s.cfg.Server.AuthServerHttpPort)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(
@@ -73,4 +89,18 @@ func (s *httpServer) Run() {
 		syscall.SIGTERM,
 	)
 	<-quit
+}
+
+func newUserClient(cfg *config.Config) *grpc.ClientConn {
+	conn, err := grpc.NewClient(
+		fmt.Sprintf(":%v", cfg.Server.UserServerGrpcPort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		logger.Fatal("AUTH", "Failed to connect to user gRPC server: %v", err)
+	}
+
+	logger.Info("AUTH", "🎉 Connected to user gRPC server successfully")
+
+	return conn
 }

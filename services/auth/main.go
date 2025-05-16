@@ -1,10 +1,22 @@
 package main
 
 import (
+	"os"
+
+	"github.com/charmbracelet/log"
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/server"
+	"github.com/vasapolrittideah/money-tracker-api/shared/config"
+	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
 )
 
 func main() {
-	httpServer := server.NewHttpServer()
+	logger.InitLogger(os.Stderr, log.DebugLevel)
+
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		logger.Fatal("AUTH", "Failed to load configuration: %v", err)
+	}
+
+	httpServer := server.NewAuthHttpServer(cfg)
 	httpServer.Run()
 }

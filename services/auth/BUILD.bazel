@@ -5,7 +5,12 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/vasapolrittideah/money-tracker-api/services/auth",
     visibility = ["//visibility:public"],
-    deps = ["//services/auth/server"],
+    deps = [
+        "//services/auth/server",
+        "//shared/config",
+        "//shared/logger",
+        "@com_github_charmbracelet_log//:log",
+    ],
 )
 
 go_binary(
