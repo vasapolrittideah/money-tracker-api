@@ -5,8 +5,8 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/services/users/models"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
-	"github.com/vasapolrittideah/money-tracker-api/shared/domain/app_error"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain/response"
+	"google.golang.org/grpc/codes"
 )
 
 type UserHttpHandler struct {
@@ -30,10 +30,8 @@ func (h UserHttpHandler) RegisterRouter() {
 func (h UserHttpHandler) GetAllUsers(c *fiber.Ctx) error {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
-		appErr := app_error.Assert(err)
-
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			response.Error(appErr.Code, appErr.Message),
+			response.Error(err.Code, err.Error()),
 		)
 	}
 
@@ -44,19 +42,15 @@ func (h UserHttpHandler) GetUserById(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByIdRequest)
 
 	if err := c.BodyParser(payload); err != nil {
-		appErr := app_error.Assert(err)
-
 		return c.Status(fiber.StatusBadRequest).JSON(
-			response.Error(appErr.Code, appErr.Message),
+			response.Error(codes.InvalidArgument, err.Error()),
 		)
 	}
 
 	user, err := h.service.GetUserById(payload.Id)
 	if err != nil {
-		appErr := app_error.Assert(err)
-
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			response.Error(appErr.Code, appErr.Message),
+			response.Error(err.Code, err.Error()),
 		)
 	}
 
@@ -67,19 +61,15 @@ func (h UserHttpHandler) GetUserByEmail(c *fiber.Ctx) error {
 	payload := new(models.GetOrderByEmailRequest)
 
 	if err := c.BodyParser(payload); err != nil {
-		appErr := app_error.Assert(err)
-
 		return c.Status(fiber.StatusBadRequest).JSON(
-			response.Error(appErr.Code, appErr.Message),
+			response.Error(codes.InvalidArgument, err.Error()),
 		)
 	}
 
 	user, err := h.service.GetUserByEmail(payload.Email)
 	if err != nil {
-		appErr := app_error.Assert(err)
-
 		return c.Status(fiber.StatusInternalServerError).JSON(
-			response.Error(appErr.Code, appErr.Message),
+			response.Error(err.Code, err.Error()),
 		)
 	}
 

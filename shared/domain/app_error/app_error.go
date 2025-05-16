@@ -6,26 +6,22 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type AppError struct {
-	Code    codes.Code
-	Message string
+type Error struct {
+	Code codes.Code
+	Err  error
 }
 
-func (e *AppError) Error() string {
-	return fmt.Sprintf("[%s]: %s", e.Code.String(), e.Message)
+func (e *Error) Error() string {
+	return fmt.Sprintf("[%s] %v", e.Code.String(), e.Err)
 }
 
-func New(code codes.Code, format string, args ...any) *AppError {
-	return &AppError{
-		Code:    code,
-		Message: fmt.Sprintf(format, args...),
+func (e *Error) Unwrap() error {
+	return e.Err
+}
+
+func New(code codes.Code, err error) *Error {
+	return &Error{
+		Code: code,
+		Err:  err,
 	}
-}
-
-func Assert(err error) *AppError {
-	if appErr, ok := err.(*AppError); ok {
-		return appErr
-	}
-
-	return New(codes.Unknown, "%s", err.Error())
 }
