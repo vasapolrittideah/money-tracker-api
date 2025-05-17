@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
-	"github.com/vasapolrittideah/money-tracker-api/services/users/server"
+	"github.com/vasapolrittideah/money-tracker-api/services/user/server"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/database"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"

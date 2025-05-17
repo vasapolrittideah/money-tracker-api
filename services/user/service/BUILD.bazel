@@ -3,10 +3,10 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "service",
     srcs = ["service.go"],
-    importpath = "github.com/vasapolrittideah/money-tracker-api/services/users/service",
+    importpath = "github.com/vasapolrittideah/money-tracker-api/services/user/service",
     visibility = ["//visibility:public"],
     deps = [
-        "//services/users/repository",
+        "//services/user/repository",
         "//shared/config",
         "//shared/domain",
         "//shared/domain/app_error",

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	userpb "github.com/vasapolrittideah/money-tracker-api/protogen/user"
-	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
+	"github.com/vasapolrittideah/money-tracker-api/services/user/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
 	"github.com/vasapolrittideah/money-tracker-api/shared/mapper"

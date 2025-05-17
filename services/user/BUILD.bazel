@@ -4,12 +4,12 @@ load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 go_library(
-    name = "users_lib",
+    name = "user_lib",
     srcs = ["main.go"],
-    importpath = "github.com/vasapolrittideah/money-tracker-api/services/users",
+    importpath = "github.com/vasapolrittideah/money-tracker-api/services/user",
     visibility = ["//visibility:private"],
     deps = [
-        "//services/users/server",
+        "//services/user/server",
         "//shared/config",
         "//shared/database",
         "//shared/domain",
@@ -20,8 +20,8 @@ go_library(
 )
 
 go_binary(
-    name = "users",
-    embed = [":users_lib"],
+    name = "user",
+    embed = [":user_lib"],
     visibility = ["//visibility:public"],
 )
 
@@ -42,14 +42,14 @@ pkg_tar(
     name = "app",
     srcs = [
         ":env_files",
-        ":users",
+        ":user",
     ],
 )
 
 oci_image(
     name = "image",
     base = "@distroless_base",
-    entrypoint = ["/users"],
+    entrypoint = ["/user"],
     tars = [":app"],
 )
 

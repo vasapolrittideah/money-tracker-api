@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/google/uuid"
-	"github.com/vasapolrittideah/money-tracker-api/services/users/repository"
+	"github.com/vasapolrittideah/money-tracker-api/services/user/repository"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain/app_error"
