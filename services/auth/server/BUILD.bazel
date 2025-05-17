@@ -6,11 +6,12 @@ go_library(
     importpath = "github.com/vasapolrittideah/money-tracker-api/services/auth/server",
     visibility = ["//visibility:public"],
     deps = [
-        "//protogen/users_proto",
+        "//protogen/user",
         "//services/auth/handler",
         "//services/auth/service",
         "//shared/config",
         "//shared/logger",
+        "//shared/middleware",
         "@com_github_gofiber_fiber_v2//:fiber",
         "@com_github_gofiber_fiber_v2//middleware/cors",
         "@com_github_gofiber_fiber_v2//middleware/logger",

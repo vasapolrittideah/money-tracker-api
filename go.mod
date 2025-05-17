@@ -3,6 +3,7 @@ module github.com/vasapolrittideah/money-tracker-api
 go 1.24.3
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/log v0.4.2
 	github.com/go-playground/locales v0.14.1
@@ -13,6 +14,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/matthewhartstonge/argon2 v1.3.1
 	github.com/spf13/viper v1.20.1
+	github.com/stretchr/testify v1.10.0
 	google.golang.org/grpc v1.67.3
 	google.golang.org/protobuf v1.36.6
 	gorm.io/driver/postgres v1.5.11
@@ -26,6 +28,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
@@ -44,6 +47,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

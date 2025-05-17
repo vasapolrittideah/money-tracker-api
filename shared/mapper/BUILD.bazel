@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/vasapolrittideah/money-tracker-api/shared/mapper",
     visibility = ["//visibility:public"],
     deps = [
-        "//protogen/users_proto",
+        "//protogen/user",
         "//shared/domain",
         "@com_github_google_uuid//:uuid",
         "@org_golang_google_protobuf//types/known/timestamppb",

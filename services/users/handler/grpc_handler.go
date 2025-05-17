@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
+	userpb "github.com/vasapolrittideah/money-tracker-api/protogen/user"
 	"github.com/vasapolrittideah/money-tracker-api/services/users/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
@@ -15,7 +15,7 @@ import (
 
 type UserGrpcHandler struct {
 	service service.UserService
-	users_proto.UnimplementedUserServiceServer
+	userpb.UnimplementedUserServiceServer
 	cfg *config.Config
 }
 
@@ -25,24 +25,24 @@ func NewUserGrpcHandler(grpc *grpc.Server, service service.UserService, cfg *con
 		cfg:     cfg,
 	}
 
-	users_proto.RegisterUserServiceServer(grpc, handler)
+	userpb.RegisterUserServiceServer(grpc, handler)
 }
 
 func (h *UserGrpcHandler) GetAllUsers(
 	c context.Context,
-	req *users_proto.GetAllUsersRequest,
-) (*users_proto.GetAllUsersResponse, error) {
+	req *userpb.GetAllUsersRequest,
+) (*userpb.GetAllUsersResponse, error) {
 	users, err := h.service.GetAllUsers()
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	var protoUsers []*users_proto.User
+	var protoUsers []*userpb.User
 	for _, user := range users {
 		protoUsers = append(protoUsers, mapper.MapUserEntityToProto(*user))
 	}
 
-	res := &users_proto.GetAllUsersResponse{
+	res := &userpb.GetAllUsersResponse{
 		Users: protoUsers,
 	}
 	return res, nil
@@ -50,14 +50,14 @@ func (h *UserGrpcHandler) GetAllUsers(
 
 func (h *UserGrpcHandler) GetUserById(
 	c context.Context,
-	req *users_proto.GetUserByIdRequest,
-) (*users_proto.GetUserByIdResponse, error) {
+	req *userpb.GetUserByIdRequest,
+) (*userpb.GetUserByIdResponse, error) {
 	user, err := h.service.GetUserById(uuid.MustParse(req.UserId))
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	res := &users_proto.GetUserByIdResponse{
+	res := &userpb.GetUserByIdResponse{
 		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
@@ -65,14 +65,14 @@ func (h *UserGrpcHandler) GetUserById(
 
 func (h *UserGrpcHandler) GetUserByEmail(
 	c context.Context,
-	req *users_proto.GetUserByEmailRequest,
-) (*users_proto.GetUserByEmailResponse, error) {
+	req *userpb.GetUserByEmailRequest,
+) (*userpb.GetUserByEmailResponse, error) {
 	user, err := h.service.GetUserByEmail(req.Email)
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	res := &users_proto.GetUserByEmailResponse{
+	res := &userpb.GetUserByEmailResponse{
 		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
@@ -80,8 +80,8 @@ func (h *UserGrpcHandler) GetUserByEmail(
 
 func (h *UserGrpcHandler) CreateUser(
 	c context.Context,
-	req *users_proto.CreateUserRequest,
-) (*users_proto.CreateUserResponse, error) {
+	req *userpb.CreateUserRequest,
+) (*userpb.CreateUserResponse, error) {
 	user, err := h.service.CreateUser(domain.User{
 		FullName:       req.FullName,
 		Email:          req.Email,
@@ -91,7 +91,7 @@ func (h *UserGrpcHandler) CreateUser(
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	res := &users_proto.CreateUserResponse{
+	res := &userpb.CreateUserResponse{
 		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
@@ -99,8 +99,8 @@ func (h *UserGrpcHandler) CreateUser(
 
 func (h *UserGrpcHandler) UpdateUser(
 	c context.Context,
-	req *users_proto.UpdateUserRequest,
-) (*users_proto.UpdateUserResponse, error) {
+	req *userpb.UpdateUserRequest,
+) (*userpb.UpdateUserResponse, error) {
 	user, err := h.service.UpdateUser(domain.User{
 		FullName: req.User.FullName,
 		Email:    req.User.Email,
@@ -109,7 +109,7 @@ func (h *UserGrpcHandler) UpdateUser(
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	res := &users_proto.UpdateUserResponse{
+	res := &userpb.UpdateUserResponse{
 		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil
@@ -117,14 +117,14 @@ func (h *UserGrpcHandler) UpdateUser(
 
 func (h *UserGrpcHandler) DeleteUser(
 	c context.Context,
-	req *users_proto.DeleteUserRequest,
-) (*users_proto.DeleteUserResponse, error) {
+	req *userpb.DeleteUserRequest,
+) (*userpb.DeleteUserResponse, error) {
 	user, err := h.service.DeleteUser(uuid.MustParse(req.UserId))
 	if err != nil {
 		return nil, status.Errorf(err.Code, "%s", err.Error())
 	}
 
-	res := &users_proto.DeleteUserResponse{
+	res := &userpb.DeleteUserResponse{
 		User: mapper.MapUserEntityToProto(user),
 	}
 	return res, nil

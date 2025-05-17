@@ -13,5 +13,4 @@ go_library(
     srcs = ["path_util.go"],
     importpath = "github.com/vasapolrittideah/money-tracker-api/shared/utils/path_util",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_charmbracelet_log//:log"],
 )

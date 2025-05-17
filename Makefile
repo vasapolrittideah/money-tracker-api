@@ -31,11 +31,8 @@ bazel-gazelle:
 bazel-build:
 	bazel build //...
 
-bazel-get:
-	bazel run @rules_go//go -- get
-
 bazel-tidy:
-	bazel run @rules_go//go -- mod tidy -v
+	bazel mod tidy
 
 bazel-test:
 	bazel test //...
@@ -56,7 +53,7 @@ proto:
 	@echo "🔧 Generating protobuf files..."
 	@mkdir -p $(OUT_DIR)
 	@for file in $(PROTO_FILES); do \
-		base=$$(basename $$file .proto)_proto; \
+		base=$$(basename $$file .proto); \
 		mkdir -p $(OUT_DIR)/$$base; \
 		protoc \
 			--proto_path=$(PROTO_DIR) \

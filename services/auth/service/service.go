@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
+	userpb "github.com/vasapolrittideah/money-tracker-api/protogen/user"
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/models"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
 	"github.com/vasapolrittideah/money-tracker-api/shared/domain"
@@ -24,11 +24,11 @@ type AuthService interface {
 }
 
 type authService struct {
-	userClient users_proto.UserServiceClient
+	userClient userpb.UserServiceClient
 	cfg        *config.Config
 }
 
-func NewAuthService(userClient users_proto.UserServiceClient, cfg *config.Config) AuthService {
+func NewAuthService(userClient userpb.UserServiceClient, cfg *config.Config) AuthService {
 	return &authService{
 		userClient: userClient,
 		cfg:        cfg,
@@ -50,7 +50,7 @@ func (s *authService) SignUp(req models.SignUpRequest) (*models.SignUpResponse, 
 		HashedPassword: hashedPassword,
 	}
 
-	res, grpcErr := s.userClient.CreateUser(ctx, &users_proto.CreateUserRequest{
+	res, grpcErr := s.userClient.CreateUser(ctx, &userpb.CreateUserRequest{
 		FullName:       newUser.FullName,
 		Email:          newUser.Email,
 		HashedPassword: newUser.HashedPassword,
@@ -70,7 +70,7 @@ func (s *authService) SignIn(req models.SignInRequest) (*models.SignInResponse, 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	res, grpcErr := s.userClient.GetUserByEmail(ctx, &users_proto.GetUserByEmailRequest{
+	res, grpcErr := s.userClient.GetUserByEmail(ctx, &userpb.GetUserByEmailRequest{
 		Email: req.Email,
 	})
 	if grpcErr != nil {
@@ -110,8 +110,8 @@ func (s *authService) SignIn(req models.SignInRequest) (*models.SignInResponse, 
 		)
 	}
 
-	if _, err = s.userClient.UpdateUser(ctx, &users_proto.UpdateUserRequest{
-		User: &users_proto.User{
+	if _, err = s.userClient.UpdateUser(ctx, &userpb.UpdateUserRequest{
+		User: &userpb.User{
 			HashedRefreshToken: hashedRefreshToken,
 		},
 	}); err != nil {

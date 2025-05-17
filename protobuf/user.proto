@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/vasapolrittideah/money-tracker-api/protogen/users_proto";
+option go_package = "github.com/vasapolrittideah/money-tracker-api/protogen/userpb";
 
 import "google/protobuf/timestamp.proto";
 

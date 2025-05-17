@@ -1,17 +1,6 @@
 load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
-    name = "databaseutil",
-    srcs = ["databaseutil.go"],
-    importpath = "github.com/vasapolrittideah/money-tracker-api/shared/utils/databaseutil",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//shared/constants/error_code",
-        "@io_gorm_gorm//:gorm",
-    ],
-)
-
-go_library(
     name = "error_util",
     srcs = ["error_util.go"],
     importpath = "github.com/vasapolrittideah/money-tracker-api/shared/utils/error_util",

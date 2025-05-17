@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	middlewareLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/vasapolrittideah/money-tracker-api/protogen/users_proto"
+	userpb "github.com/vasapolrittideah/money-tracker-api/protogen/user"
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/handler"
 	"github.com/vasapolrittideah/money-tracker-api/services/auth/service"
 	"github.com/vasapolrittideah/money-tracker-api/shared/config"
@@ -67,7 +67,7 @@ func (s *httpServer) Run() {
 		}
 	}()
 
-	userClient := users_proto.NewUserServiceClient(conn)
+	userClient := userpb.NewUserServiceClient(conn)
 	router := app.Group("/api")
 
 	authService := service.NewAuthService(userClient, s.cfg)
