@@ -1,6 +1,11 @@
 {
-    "editor.formatOnSave": true,
-    "editor.rulers": [
-        120
-    ],
+  "editor.formatOnSave": true,
+  "editor.rulers": [
+    120
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Max 60 characters for the description. Must be clear and concise, summarizing the changes. Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) Format. Use correct commit message types and scopes. Use all lowercase, except for code identifiers (function names, variable names, class names, etc.).",
+    }
+  ],
 }
