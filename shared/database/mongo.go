@@ -41,19 +41,19 @@ func (d *MongoDB) Connect(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, defaultConnectionTimeout)
 	defer cancel()
 
-	client, err := mongo.Connect(options.Client().ApplyURI(d.config.uri))
+	client, err := mongo.Connect(options.Client().ApplyURI(d.config.URI))
 	if err != nil {
 		return err
 	}
 
 	d.client = client
-	d.database = client.Database(d.config.database)
+	d.database = client.Database(d.config.DB)
 
 	if err := d.client.Ping(ctx, readpref.Primary()); err != nil {
 		return err
 	}
 
-	d.logger.Info().Str("uri", d.config.uri).Msg("Successfully connected to MongoDB")
+	d.logger.Info().Str("uri", d.config.URI).Msg("Successfully connected to MongoDB")
 
 	return nil
 }
@@ -76,8 +76,8 @@ func (d *MongoDB) GetDatabase() *mongo.Database {
 
 // MongoConfig contains MongoDB connection configuration.
 type mongoConfig struct {
-	uri      string `env:"MONGO_URI"`
-	database string `env:"MONGO_DB"`
+	URI string `env:"MONGO_URI"`
+	DB  string `env:"MONGO_DB"`
 }
 
 // newMongoConfig creates a new MongoConfig instance from environment variables.
@@ -92,11 +92,11 @@ func newMongoConfig(logger *zerolog.Logger) *mongoConfig {
 
 // validate checks if the MongoDB configuration is valid.
 func (c *mongoConfig) validate() error {
-	if c.uri == "" {
+	if c.URI == "" {
 		return errors.New("missing MONGO_URI environment variable")
 	}
 
-	if c.database == "" {
+	if c.DB == "" {
 		return errors.New("missing MONGO_DB environment variable")
 	}
 
