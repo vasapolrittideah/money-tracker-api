@@ -1,0 +1,37 @@
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: dlavrenuek/bitnami-mongodb-arm
+  tag: "8.0.4"
+
+persistence:
+  enabled: true
+  size: "8Gi"
+  storageClass: ""
+
+service:
+  type: ClusterIP
+  ports:
+    mongodb: 27017
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+replicaCount: 1
+
+metrics:
+  enabled: false
+
+podSecurityContext:
+  enabled: false
+
+containerSecurityContext:
+  enabled: false

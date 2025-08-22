@@ -1,4 +1,10 @@
 {
+  "files.associations": {
+    "Tiltfile": "starlark"
+  },
+  "python.analysis.exclude": [
+    "**/Tiltfile"
+  ],
   "editor.formatOnSave": true,
   "editor.rulers": [
     120
