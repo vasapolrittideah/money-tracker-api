@@ -25,9 +25,9 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *User) (*User, error)
 	GetUser(ctx context.Context, id string) (*User, error)
 	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	UpdateUser(ctx context.Context, user *User) (*User, error)
+	UpdateUser(ctx context.Context, id string, params UpdateUserParams) (*User, error)
 	DeleteUser(ctx context.Context, id string) (*User, error)
-	FilterUsers(ctx context.Context, params FilterUsersParams) ([]*User, error)
+	ListUsers(ctx context.Context, params FilterUsersParams) ([]*User, error)
 }
 
 // UpdateUserParams defines the optional parameters for updating a user.
