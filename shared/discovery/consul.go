@@ -71,7 +71,7 @@ func (r *ConsulRegistry) Register(instanceID, serviceName, serviceAddress string
 	}
 
 	if err := r.client.Agent().ServiceRegister(registration); err != nil {
-		return nil
+		return err
 	}
 
 	r.logger.Info().
