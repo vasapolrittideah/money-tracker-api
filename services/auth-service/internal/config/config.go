@@ -9,10 +9,11 @@ import (
 
 // AuthServiceConfig contains the configuration for the auth service.
 type AuthServiceConfig struct {
-	Environment string `env:"ENVIRONMENT"`
-	Name        string `env:"SERVICE_NAME"`
-	Address     string `env:"SERVICE_ADDRESS"`
-	Token       TokenConfig
+	Environment     string `env:"ENVIRONMENT"`
+	Name            string `env:"SERVICE_NAME"`
+	Address         string `env:"SERVICE_ADDRESS"`
+	RegisterAddress string `env:"SERVICE_REGISTER_ADDRESS"`
+	Token           TokenConfig
 }
 
 // TokenConfig contains the configuration for JWT tokens.

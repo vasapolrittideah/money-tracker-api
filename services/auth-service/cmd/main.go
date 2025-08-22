@@ -44,7 +44,7 @@ func main() {
 	}
 
 	serviceID := authServiceCfg.Name + "-1"
-	if err := consulRegistry.Register(serviceID, authServiceCfg.Name, authServiceCfg.Address); err != nil {
+	if err := consulRegistry.Register(serviceID, authServiceCfg.Name, authServiceCfg.RegisterAddress); err != nil {
 		logger.Fatal().Err(err).Msg("failed to register service in Consul")
 	}
 	defer func() {

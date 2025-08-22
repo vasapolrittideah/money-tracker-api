@@ -36,12 +36,12 @@ configMap:
   data:
     ENVIRONMENT: "development"
     SERVICE_NAME: "auth-service"
-    SERVICE_ADDR: "0.0.0.0:9001"
-    SERVICE_REGISTER_ADDR: "auth-service.default:9001"
+    SERVICE_ADDRESS: "0.0.0.0:9001"
+    SERVICE_REGISTER_ADDRESS: "auth-service.default:9001"
     ACCESS_TOKEN_EXPIRES_IN: "2h"
     REFRESH_TOKEN_EXPIRES_IN: "336h"
     TOKEN_ISSUER: "auth-service"
-    CONSUL_ADDR: "consul-server.consul:8500"
+    CONSUL_ADDRESS: "consul-server.consul:8500"
 
 secrets:
   enabled: true
