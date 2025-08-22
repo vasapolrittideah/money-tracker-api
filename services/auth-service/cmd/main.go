@@ -10,6 +10,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/vasapolrittideah/money-tracker-api/services/auth-service/internal/config"
+	grpchandler "github.com/vasapolrittideah/money-tracker-api/services/auth-service/internal/delivery/grpc"
+	mongoRepo "github.com/vasapolrittideah/money-tracker-api/services/auth-service/internal/repository/mongo"
+	"github.com/vasapolrittideah/money-tracker-api/services/auth-service/internal/usecase"
+	"github.com/vasapolrittideah/money-tracker-api/shared/auth"
 	"github.com/vasapolrittideah/money-tracker-api/shared/database"
 	"github.com/vasapolrittideah/money-tracker-api/shared/discovery"
 	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
@@ -49,15 +53,27 @@ func main() {
 		}
 	}()
 
+	jwtAuthenticator := auth.NewJWTAuthenticator(
+		authServiceCfg.Token.Issuer,
+		authServiceCfg.Token.Issuer,
+	)
+
+	identityRepo := mongoRepo.NewIdentityMongoRepository(mongodb.GetDatabase())
+	sessionRepo := mongoRepo.NewSessionMongoRepository(mongodb.GetDatabase())
+	userRepo := mongoRepo.NewUserMongoRepository(ctx, logger, mongodb.GetDatabase())
+
+	authUsecase := usecase.NewAuthUsecase(identityRepo, sessionRepo, userRepo, jwtAuthenticator, authServiceCfg)
+
+	grpcServer := grpc.NewServer()
+	grpchandler.NewAuthGRPCHandler(grpcServer, logger, authUsecase)
+
+	grpcutil.RegisterHealthServer(grpcServer)
+
 	lc := net.ListenConfig{}
 	lis, err := lc.Listen(ctx, "tcp", authServiceCfg.Address)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to create listener")
 	}
-
-	grpcServer := grpc.NewServer()
-
-	grpcutil.RegisterHealthServer(grpcServer)
 
 	go func() {
 		logger.Info().Msg("Starting gRPC server...")

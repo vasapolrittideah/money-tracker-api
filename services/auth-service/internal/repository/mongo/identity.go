@@ -17,7 +17,7 @@ type identityMongoRepository struct {
 	db *mongo.Database
 }
 
-func NewIdentityRepository(db *mongo.Database) domain.IdentityRepository {
+func NewIdentityMongoRepository(db *mongo.Database) domain.IdentityRepository {
 	return &identityMongoRepository{db: db}
 }
 

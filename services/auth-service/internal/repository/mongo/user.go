@@ -19,7 +19,7 @@ type userMongoRepository struct {
 	db *mongo.Database
 }
 
-func NewUserMongoRepository(ctx context.Context, db *mongo.Database, logger *zerolog.Logger) domain.UserRepository {
+func NewUserMongoRepository(ctx context.Context, logger *zerolog.Logger, db *mongo.Database) domain.UserRepository {
 	collection := db.Collection(userCollection)
 
 	indexes := []mongo.IndexModel{

@@ -17,7 +17,7 @@ type sessionMongoRepository struct {
 	db *mongo.Database
 }
 
-func NewSessionRepository(db *mongo.Database) domain.SessionRepository {
+func NewSessionMongoRepository(db *mongo.Database) domain.SessionRepository {
 	return &sessionMongoRepository{db: db}
 }
 
