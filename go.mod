@@ -10,6 +10,7 @@ require (
 	github.com/rs/zerolog v1.34.0
 	go.mongodb.org/mongo-driver/v2 v2.3.0
 	google.golang.org/grpc v1.75.0
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -31,7 +32,6 @@ require (
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
 )
 
 require (
