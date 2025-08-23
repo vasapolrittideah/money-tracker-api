@@ -8,6 +8,7 @@ service AuthService {
     rpc Login(LoginRequest) returns (LoginResponse);
     rpc SignUp(SignUpRequest) returns (SignUpResponse);
     rpc LoginWithGoogle(LoginWithGoogleRequest) returns (LoginWithGoogleResponse);
+    rpc LoginWithFacebook(LoginWithFacebookRequest) returns (LoginWithFacebookResponse);
 }
 
 message LoginRequest {
@@ -36,6 +37,15 @@ message LoginWithGoogleRequest {
 }
 
 message LoginWithGoogleResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message LoginWithFacebookRequest {
+    string access_token = 1;
+}
+
+message LoginWithFacebookResponse {
     string access_token = 1;
     string refresh_token = 2;
 }

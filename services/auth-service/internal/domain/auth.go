@@ -11,6 +11,7 @@ type AuthUsecase interface {
 	Login(ctx context.Context, params LoginParams) (*authtypes.Tokens, error)
 	SignUp(ctx context.Context, params SignUpParams) (*authtypes.Tokens, error)
 	LoginWithGoogle(ctx context.Context, params LoginWithGoogleParams) (*authtypes.Tokens, error)
+	LoginWithFacebook(ctx context.Context, params LoginWithFacebookParams) (*authtypes.Tokens, error)
 }
 
 // LoginParams defines the parameters for user login.
@@ -29,4 +30,9 @@ type SignUpParams struct {
 // LoginWithGoogleParams defines the parameters for logging in with Google.
 type LoginWithGoogleParams struct {
 	IDToken string
+}
+
+// LoginWithFacebookParams defines the parameters for logging in with Facebook.
+type LoginWithFacebookParams struct {
+	AccessToken string
 }

@@ -15,6 +15,13 @@ type AuthServiceConfig struct {
 	RegisterAddress string `env:"SERVICE_REGISTER_ADDRESS"`
 	Token           TokenConfig
 	Google          OAuthGoogleConfig
+	Facebook        OAuthFacebookConfig
+}
+
+// OAuthFacebookConfig contains the configuration for Facebook OAuth.
+type OAuthFacebookConfig struct {
+	AppID     string `env:"OAUTH_FACEBOOK_APP_ID"`
+	AppSecret string `env:"OAUTH_FACEBOOK_APP_SECRET"`
 }
 
 // OAuthGoogleConfig contains the configuration for Google OAuth.
