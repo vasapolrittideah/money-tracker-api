@@ -12,13 +12,28 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/vasapolrittideah/money-tracker-api/services/api-gateway/internal/config"
+	httphandler "github.com/vasapolrittideah/money-tracker-api/services/api-gateway/internal/delivery/http"
+	authclient "github.com/vasapolrittideah/money-tracker-api/services/auth-service/pkg/client"
+	"github.com/vasapolrittideah/money-tracker-api/shared/discovery"
 	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
 )
 
 func main() {
 	logger := logger.New()
 
+	consulRegistry, err := discovery.NewConsulRegistry(logger)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to create consul registry")
+	}
+
 	apiGatewayCfg := config.NewAPIGatewayConfig(logger)
+	authServiceClient, err := authclient.NewAuthServiceClient(
+		apiGatewayCfg.AuthService.Name,
+		consulRegistry,
+	)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to create auth service client")
+	}
 
 	r := chi.NewRouter()
 
@@ -34,6 +49,9 @@ func main() {
 		IdleTimeout:  time.Minute,
 		Handler:      r,
 	}
+
+	authHandler := httphandler.NewAuthHTTPHandler(r, logger, authServiceClient)
+	authHandler.RegisterRoutes()
 
 	serverErrors := make(chan error, 1)
 

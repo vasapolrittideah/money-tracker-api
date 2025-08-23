@@ -1,6 +1,6 @@
 # api gateway
 
-The API Gateway serves as the single entry point for all client requests in the moneylog-api microservices architecture. It handles request routing, authentication, rate limiting, and provides a unified HTTP REST API interface while communicating with backend services via gRPC.
+The API Gateway serves as the single entry point for all client requests in the money-tracker-api microservices architecture. It handles request routing, authentication, rate limiting, and provides a unified HTTP REST API interface while communicating with backend services via gRPC.
 
 ## Architecture
 
@@ -15,8 +15,7 @@ services/api_gateway/
 │   ├── delivery/          # Request handlers
 │   │   └── http/          # HTTP server handlers and routing
 │   ├── middleware/        # HTTP middleware (auth, logging, CORS, etc.)
-│   ├── payload/           # Request/response payload definitions
-│   └── validator/         # Request validation logic
+│   └── payload/           # Request/response payload definitions
 └── README.md              # Service documentation
 ```
 
@@ -38,11 +37,6 @@ services/api_gateway/
 - API request and response structures
 - JSON marshaling/unmarshaling logic
 - Data transformation between HTTP and gRPC formats
-
-**Input Validation** (`internal/validator/`)
-- Request payload validation
-- Business rule enforcement
-- Schema validation for incoming data
 
 ## Key Features
 

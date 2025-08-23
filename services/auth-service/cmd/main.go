@@ -17,7 +17,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/shared/database"
 	"github.com/vasapolrittideah/money-tracker-api/shared/discovery"
 	"github.com/vasapolrittideah/money-tracker-api/shared/logger"
-	"github.com/vasapolrittideah/money-tracker-api/shared/utils/grpcutil"
+	"github.com/vasapolrittideah/money-tracker-api/shared/utilities"
 )
 
 func main() {
@@ -67,7 +67,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	grpchandler.NewAuthGRPCHandler(grpcServer, logger, authUsecase)
 
-	grpcutil.RegisterHealthServer(grpcServer)
+	utilities.RegisterHealthServer(grpcServer)
 
 	lc := net.ListenConfig{}
 	lis, err := lc.Listen(ctx, "tcp", authServiceCfg.Address)

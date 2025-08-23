@@ -33,34 +33,3 @@ const (
 	ErrorCodeConflict     = "CONFLICT"
 	ErrorCodeRateLimit    = "RATE_LIMIT_EXCEEDED"
 )
-
-// NewSuccessResponse creates a new success response with the given data.
-func NewSuccessResponse(data any) APIResponse {
-	return APIResponse{
-		Data:      data,
-		Timestamp: time.Now(),
-	}
-}
-
-// NewErrorResponse creates a new error response with the given code and message.
-func NewErrorResponse(code, message string) APIResponse {
-	return APIResponse{
-		Error: &APIError{
-			Code:    code,
-			Message: message,
-		},
-		Timestamp: time.Now(),
-	}
-}
-
-// NewValidationErrorResponse creates a new validation error response with the given details.
-func NewValidationErrorResponse(details []APIValidationError) APIResponse {
-	return APIResponse{
-		Error: &APIError{
-			Code:    ErrorCodeValidation,
-			Message: "Validation failed",
-			Details: details,
-		},
-		Timestamp: time.Now(),
-	}
-}
