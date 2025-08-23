@@ -20,3 +20,12 @@ type SignUpResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type LoginWithGoogleRequest struct {
+	IDToken string `json:"id_token" validate:"required"`
+}
+
+type LoginWithGoogleResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
