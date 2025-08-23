@@ -29,3 +29,12 @@ type LoginWithGoogleResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type LoginWithFacebookRequest struct {
+	AccessToken string `json:"access_token" validate:"required"`
+}
+
+type LoginWithFacebookResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}

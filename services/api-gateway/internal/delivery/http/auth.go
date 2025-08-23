@@ -38,6 +38,7 @@ func (h *AuthHTTPHandler) RegisterRoutes() {
 		r.Post("/login", h.login)
 		r.Post("/signup", h.signUp)
 		r.Post("/google", h.loginWithGoogle)
+		r.Post("/facebook", h.loginWithFacebook)
 	})
 }
 
