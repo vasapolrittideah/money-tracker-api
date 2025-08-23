@@ -98,6 +98,46 @@ func (u *authUsecase) SignUp(ctx context.Context, params domain.SignUpParams) (*
 	return u.createAuthSession(ctx, user.ID.Hex())
 }
 
+func (u *authUsecase) linkOAuthAccount(
+	ctx context.Context,
+	provider, providerID string,
+	oauthUser authtypes.OAuthUser,
+) (*authtypes.Tokens, error) {
+	// Check if OAuth account is already linked to an existing local user
+	if identity, err := u.identityRepo.GetIdentityByProvider(ctx, providerID, provider); err == nil {
+		// OAuth account already linked — authenticate the linked user
+		return u.createAuthSession(ctx, identity.UserID)
+	} else {
+		if !errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, err
+		}
+
+		// OAuth account not linked yet — try to link with existing local user by email
+		user, err := u.userRepo.GetUserByEmail(ctx, oauthUser.Email)
+		if err != nil {
+			if !errors.Is(err, mongo.ErrNoDocuments) {
+				// User must register locally first before linking OAuth account
+				return nil, ErrInvalidCredentials
+			}
+
+			return nil, err
+		}
+
+		// Link OAuth account with existing local user
+		_, err = u.identityRepo.CreateIdentity(ctx, &domain.Identity{
+			Provider:   provider,
+			ProviderID: providerID,
+			UserID:     user.ID.Hex(),
+			Email:      user.Email,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		return u.createAuthSession(ctx, user.ID.Hex())
+	}
+}
+
 func (u *authUsecase) createAuthSession(ctx context.Context, userID string) (*authtypes.Tokens, error) {
 	session, err := u.sessionRepo.CreateSession(ctx, &domain.Session{UserID: userID})
 	if err != nil {

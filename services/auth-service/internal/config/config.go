@@ -14,6 +14,13 @@ type AuthServiceConfig struct {
 	Address         string `env:"SERVICE_ADDRESS"`
 	RegisterAddress string `env:"SERVICE_REGISTER_ADDRESS"`
 	Token           TokenConfig
+	Google          OAuthGoogleConfig
+}
+
+// OAuthGoogleConfig contains the configuration for Google OAuth.
+type OAuthGoogleConfig struct {
+	ClientID     string `env:"OAUTH_GOOGLE_CLIENT_ID"`
+	ClientSecret string `env:"OAUTH_GOOGLE_CLIENT_SECRET"`
 }
 
 // TokenConfig contains the configuration for JWT tokens.

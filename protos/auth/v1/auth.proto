@@ -7,6 +7,7 @@ option go_package = "shared/protos/auth/v1;authpbv1";
 service AuthService {
     rpc Login(LoginRequest) returns (LoginResponse);
     rpc SignUp(SignUpRequest) returns (SignUpResponse);
+    rpc LoginWithGoogle(LoginWithGoogleRequest) returns (LoginWithGoogleResponse);
 }
 
 message LoginRequest {
@@ -26,6 +27,15 @@ message SignUpRequest {
 }
 
 message SignUpResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message LoginWithGoogleRequest {
+    string id_token = 1;
+}
+
+message LoginWithGoogleResponse {
     string access_token = 1;
     string refresh_token = 2;
 }

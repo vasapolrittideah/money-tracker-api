@@ -13,3 +13,8 @@ type JWTClaims struct {
 	UserID    string `json:"user_id"`
 	SessionID string `json:"session_id"`
 }
+
+type OAuthUser struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
