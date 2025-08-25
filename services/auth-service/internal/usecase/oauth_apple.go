@@ -28,7 +28,7 @@ func (u *authUsecase) LoginWithApple(
 ) (*authtypes.Tokens, error) {
 	claims, err := u.verifyAppleIdentityToken(ctx, params.IdentityToken)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to verify apple identity token: %v", err)
 	}
 
 	oauthUser := authtypes.OAuthUser{

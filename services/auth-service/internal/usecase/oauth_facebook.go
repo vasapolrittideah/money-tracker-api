@@ -28,12 +28,12 @@ func (u *authUsecase) LoginWithFacebook(
 		u.authServiceCfg.Facebook.AppSecret,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to validate facebook token: %v", err)
 	}
 
 	userInfo, err := u.getUserInfoFromFacebook(params.AccessToken)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get user info from facebook: %v", err)
 	}
 
 	oauthUser := authtypes.OAuthUser{
@@ -54,18 +54,18 @@ func (u *authUsecase) validateFacebookToken(
 
 	resp, err := http.Get(validateURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch facebook token info: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read token info response body: %v", err)
 	}
 
 	var tokenResp authtypes.FacebookTokenResponse
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal token info response body: %v", err)
 	}
 
 	if !tokenResp.Data.IsValid {
@@ -80,7 +80,7 @@ func (u *authUsecase) validateFacebookToken(
 		return nil, ErrFacebookTokenExpired
 	}
 
-	return &tokenResp, err
+	return &tokenResp, nil
 }
 
 func (u *authUsecase) getUserInfoFromFacebook(accessToken string) (*authtypes.FacebookUser, error) {
@@ -91,18 +91,18 @@ func (u *authUsecase) getUserInfoFromFacebook(accessToken string) (*authtypes.Fa
 
 	userResp, err := http.Get(userURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch facebook user info: %v", err)
 	}
 	defer userResp.Body.Close()
 
 	userBody, err := io.ReadAll(userResp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read user info response body: %v", err)
 	}
 
 	var user authtypes.FacebookUser
 	if err := json.Unmarshal(userBody, &user); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal user info response body: %v", err)
 	}
 
 	return &user, nil

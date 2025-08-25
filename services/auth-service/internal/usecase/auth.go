@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -51,7 +52,7 @@ func (u *authUsecase) Login(ctx context.Context, params domain.LoginParams) (*au
 			return nil, ErrInvalidCredentials
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("failed to get user by email: %v", err)
 	}
 
 	if ok, err := security.VerifyPassword(params.Password, user.PasswordHash); err != nil {
@@ -61,7 +62,7 @@ func (u *authUsecase) Login(ctx context.Context, params domain.LoginParams) (*au
 	}
 
 	if err := u.identityRepo.UpdateLastLogin(ctx, user.ID.Hex()); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update last login: %v", err)
 	}
 
 	return u.createAuthSession(ctx, user.ID.Hex())
@@ -70,7 +71,7 @@ func (u *authUsecase) Login(ctx context.Context, params domain.LoginParams) (*au
 func (u *authUsecase) SignUp(ctx context.Context, params domain.SignUpParams) (*authtypes.Tokens, error) {
 	passwordHash, err := security.HashPassword(params.Password)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
 	user, err := u.userRepo.CreateUser(ctx, &domain.User{
@@ -83,7 +84,7 @@ func (u *authUsecase) SignUp(ctx context.Context, params domain.SignUpParams) (*
 			return nil, ErrUserAlreadyExists
 		}
 
-		return nil, err
+		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
 
 	if _, err := u.identityRepo.CreateIdentity(ctx, &domain.Identity{
@@ -92,7 +93,7 @@ func (u *authUsecase) SignUp(ctx context.Context, params domain.SignUpParams) (*
 		ProviderID: "",
 		Email:      user.Email,
 	}); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create identity: %v", err)
 	}
 
 	return u.createAuthSession(ctx, user.ID.Hex())
@@ -104,44 +105,45 @@ func (u *authUsecase) linkOAuthAccount(
 	oauthUser authtypes.OAuthUser,
 ) (*authtypes.Tokens, error) {
 	// Check if OAuth account is already linked to an existing local user
-	if identity, err := u.identityRepo.GetIdentityByProvider(ctx, providerID, provider); err == nil {
+	identity, err := u.identityRepo.GetIdentityByProvider(ctx, providerID, provider)
+	if err == nil {
 		// OAuth account already linked — authenticate the linked user
 		return u.createAuthSession(ctx, identity.UserID)
-	} else {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, err
-		}
-
-		// OAuth account not linked yet — try to link with existing local user by email
-		user, err := u.userRepo.GetUserByEmail(ctx, oauthUser.Email)
-		if err != nil {
-			if !errors.Is(err, mongo.ErrNoDocuments) {
-				// User must register locally first before linking OAuth account
-				return nil, ErrInvalidCredentials
-			}
-
-			return nil, err
-		}
-
-		// Link OAuth account with existing local user
-		_, err = u.identityRepo.CreateIdentity(ctx, &domain.Identity{
-			Provider:   provider,
-			ProviderID: providerID,
-			UserID:     user.ID.Hex(),
-			Email:      user.Email,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		return u.createAuthSession(ctx, user.ID.Hex())
 	}
+
+	if !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, fmt.Errorf("failed to get identity by provider: %v", err)
+	}
+
+	// OAuth account not linked yet — try to link with existing local user by email
+	user, err := u.userRepo.GetUserByEmail(ctx, oauthUser.Email)
+	if err != nil {
+		if !errors.Is(err, mongo.ErrNoDocuments) {
+			// User must register locally first before linking OAuth account
+			return nil, ErrInvalidCredentials
+		}
+
+		return nil, fmt.Errorf("failed to get user by email: %v", err)
+	}
+
+	// Link OAuth account with existing local user
+	_, err = u.identityRepo.CreateIdentity(ctx, &domain.Identity{
+		Provider:   provider,
+		ProviderID: providerID,
+		UserID:     user.ID.Hex(),
+		Email:      user.Email,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create identity: %v", err)
+	}
+
+	return u.createAuthSession(ctx, user.ID.Hex())
 }
 
 func (u *authUsecase) createAuthSession(ctx context.Context, userID string) (*authtypes.Tokens, error) {
 	session, err := u.sessionRepo.CreateSession(ctx, &domain.Session{UserID: userID})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
 
 	accessToken, err := u.generateToken(
@@ -151,7 +153,7 @@ func (u *authUsecase) createAuthSession(ctx context.Context, userID string) (*au
 		u.authServiceCfg.Token.AccessTokenExpiresIn,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to generate access token: %v", err)
 	}
 
 	refreshToken, err := u.generateToken(
@@ -161,7 +163,7 @@ func (u *authUsecase) createAuthSession(ctx context.Context, userID string) (*au
 		u.authServiceCfg.Token.RefreshTokenExpiresIn,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to generate refresh token: %v", err)
 	}
 
 	now := time.Now()
@@ -171,7 +173,7 @@ func (u *authUsecase) createAuthSession(ctx context.Context, userID string) (*au
 		AccessTokenExpiresAt:  now.Add(u.authServiceCfg.Token.AccessTokenExpiresIn),
 		RefreshTokenExpiresAt: now.Add(u.authServiceCfg.Token.RefreshTokenExpiresIn),
 	}); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update session tokens: %v", err)
 	}
 
 	return &authtypes.Tokens{
