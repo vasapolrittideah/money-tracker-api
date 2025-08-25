@@ -38,3 +38,14 @@ type LoginWithFacebookResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+type LoginWithAppleRequest struct {
+	IdentityToken     string `json:"identity_token"     validate:"required"`
+	AuthorizationCode string `json:"authorization_code"`
+	UserIdentifier    string `json:"user_identifier"`
+}
+
+type LoginWithAppleResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
