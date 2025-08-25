@@ -9,6 +9,7 @@ service AuthService {
     rpc SignUp(SignUpRequest) returns (SignUpResponse);
     rpc LoginWithGoogle(LoginWithGoogleRequest) returns (LoginWithGoogleResponse);
     rpc LoginWithFacebook(LoginWithFacebookRequest) returns (LoginWithFacebookResponse);
+    rpc LoginWithApple(LoginWithAppleRequest) returns (LoginWithAppleResponse);
 }
 
 message LoginRequest {
@@ -46,6 +47,16 @@ message LoginWithFacebookRequest {
 }
 
 message LoginWithFacebookResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message LoginWithAppleRequest {
+    string identity_token = 1;
+    string authorization_code = 2;
+}
+
+message LoginWithAppleResponse {
     string access_token = 1;
     string refresh_token = 2;
 }

@@ -34,3 +34,20 @@ type FacebookTokenResponse struct {
 		UserID      string `json:"user_id"`
 	} `json:"data"`
 }
+
+type AppleClaims struct {
+	jwt.RegisteredClaims
+
+	Issuer         string `json:"iss"`
+	Audience       string `json:"aud"`
+	ExpirationTime int64  `json:"exp"`
+	IssuedAt       int64  `json:"iat"`
+	Subject        string `json:"sub"`
+	NonceSupported bool   `json:"nonce_supported,omitempty"`
+	Nonce          string `json:"nonce,omitempty"`
+	Email          string `json:"email,omitempty"`
+	EmailVerified  string `json:"email_verified,omitempty"`
+	IsPrivateEmail string `json:"is_private_email,omitempty"`
+	RealUserStatus int    `json:"real_user_status,omitempty"`
+	TransferSub    string `json:"transfer_sub,omitempty"`
+}

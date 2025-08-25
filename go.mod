@@ -7,6 +7,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-playground/locales v0.14.1
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/matthewhartstonge/argon2 v1.3.4
 	github.com/mbobakov/grpc-consul-resolver v1.5.3
 	github.com/rs/zerolog v1.34.0
@@ -21,12 +22,14 @@ require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.8.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/form v3.1.4+incompatible // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
@@ -41,9 +44,15 @@ require (
 	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.3 // indirect
+	github.com/lestrrat-go/httpcc v1.0.1 // indirect
+	github.com/lestrrat-go/httprc v1.0.6 // indirect
+	github.com/lestrrat-go/iter v1.0.2 // indirect
+	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/segmentio/asm v1.2.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
 	go.opentelemetry.io/otel v1.37.0 // indirect

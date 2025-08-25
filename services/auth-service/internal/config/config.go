@@ -16,6 +16,15 @@ type AuthServiceConfig struct {
 	Token           TokenConfig
 	Google          OAuthGoogleConfig
 	Facebook        OAuthFacebookConfig
+	Apple           OAuthAppleConfig
+}
+
+// OAuthAppleConfig contains the configuration for Apple OAuth.
+type OAuthAppleConfig struct {
+	ClientID   string `env:"OAUTH_APPLE_CLIENT_ID"`
+	TeamID     string `env:"OAUTH_APPLE_TEAM_ID"`
+	KeyID      string `env:"OAUTH_APPLE_KEY_ID"`
+	PrivateKey string `env:"OAUTH_APPLE_PRIVATE_KEY"`
 }
 
 // OAuthFacebookConfig contains the configuration for Facebook OAuth.
