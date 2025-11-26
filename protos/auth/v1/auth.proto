@@ -6,7 +6,7 @@ option go_package = "shared/protos/auth/v1;authpbv1";
 
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
-  rpc SignUp(SignUpRequest) returns (SignUpResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
 }
 
 message LoginRequest {
@@ -19,12 +19,12 @@ message LoginResponse {
   string refresh_token = 2;
 }
 
-message SignUpRequest {
+message RegisterRequest {
   string email = 1;
   string password = 2;
 }
 
-message SignUpResponse {
+message RegisterResponse {
   string access_token = 1;
   string refresh_token = 2;
 }
