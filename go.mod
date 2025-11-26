@@ -45,6 +45,7 @@ require (
 )
 
 require (
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.4.0
