@@ -24,7 +24,7 @@ type MongoDB struct {
 
 // NewMongoDB creates a new MongoDB with the given configuration.
 // Call Connect to establish the actual connection before using the database.
-func NewMongoDB(cfg *config.DatabaseConfig) Database {
+func NewMongoDB(cfg *config.DatabaseConfig) Database[*mongo.Database] {
 	return &MongoDB{config: cfg}
 }
 
