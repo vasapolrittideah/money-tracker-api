@@ -7,6 +7,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// JWTClaims extends jwt.RegisteredClaims with application-specific fields.
+// It is used as the claims payload for both access and refresh tokens.
+type JWTClaims struct {
+	jwt.RegisteredClaims
+
+	// AccountID identifies the authenticated user this token was issued for.
+	AccountID string `json:"account_id"`
+
+	// SessionID ties the token to a specific session, allowing targeted revocation.
+	SessionID string `json:"session_id"`
+}
+
 // JWTMaker handles JWT generation and validation.
 // Every token it produces is scoped to a specific audience and issuer,
 // which are verified during validation to prevent token reuse across services.
