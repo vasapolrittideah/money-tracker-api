@@ -23,8 +23,11 @@ type AppConfig struct {
 
 // DatabaseConfig holds the connection details for the primary database.
 type DatabaseConfig struct {
-	Addr string `mapstructure:"DB_ADDR"`
-	Name string `mapstructure:"DB_NAME"`
+	Host     string `mapstructure:"DB_HOST"`
+	Port     string `mapstructure:"DB_PORT"`
+	User     string `mapstructure:"DB_USER"`
+	Password string `mapstructure:"DB_PASSWORD"`
+	Name     string `mapstructure:"DB_NAME"`
 }
 
 // JWTConfig holds the secret keys and expiry durations for access and refresh tokens.
@@ -47,7 +50,6 @@ type RedisConfig struct {
 // struct, and validates that all required fields are present.
 func Load() (*Config, error) {
 	viper.SetConfigFile(".env")
-	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
 
@@ -75,8 +77,14 @@ func Load() (*Config, error) {
 // validate checks that all required configuration fields are set
 // and returns a descriptive error for the first missing field found.
 func (c *Config) validate() error {
-	if c.Database.Addr == "" {
-		return errors.New("DB_ADDR is required")
+	if c.Database.Host == "" {
+		return errors.New("DB_HOST is required")
+	}
+	if c.Database.Port == "" {
+		return errors.New("DB_PORT is required")
+	}
+	if c.Database.Name == "" {
+		return errors.New("DB_NAME is required")
 	}
 	if c.JWT.AccessSecretKey == "" {
 		return errors.New("JWT_ACCESS_SECRET is required")
