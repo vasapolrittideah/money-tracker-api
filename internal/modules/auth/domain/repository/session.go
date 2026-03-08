@@ -17,7 +17,7 @@ type SessionRepository interface {
 	GetSessionByAccountID(ctx context.Context, accountID string) (*entity.Session, error)
 
 	// UpdateJWT replaces the token pair and their expiry times on an existing session.
-	UpdateJWT(ctx context.Context, params *UpdateJWTParams) (*entity.Session, error)
+	UpdateJWT(ctx context.Context, id string, params *UpdateJWTParams) (*entity.Session, error)
 }
 
 // UpdateJWTParams holds the new token pair and expiry times.
