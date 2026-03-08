@@ -35,7 +35,12 @@ func (d *MongoDB) Connect(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, connectionTimeout)
 	defer cancel()
 
-	client, err := mongo.Connect(options.Client().ApplyURI(d.config.Addr))
+	uri := "mongodb://" + d.config.Host + ":" + d.config.Port
+	if d.config.User != "" && d.config.Password != "" {
+		uri = "mongodb://" + d.config.User + ":" + d.config.Password + "@" + d.config.Host + ":" + d.config.Port
+	}
+
+	client, err := mongo.Connect(options.Client().ApplyURI(uri))
 	if err != nil {
 		return err
 	}
@@ -47,7 +52,7 @@ func (d *MongoDB) Connect(ctx context.Context) error {
 		return err
 	}
 
-	logger.Logger.Info().Str("addr", d.config.Addr).Msg("Successfully connected to MongoDB")
+	logger.Logger.Info().Str("uri", uri).Msg("Successfully connected to MongoDB")
 
 	return nil
 }
