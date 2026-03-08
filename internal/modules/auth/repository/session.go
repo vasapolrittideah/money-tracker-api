@@ -88,3 +88,23 @@ func (r *sessionRepository) UpdateJWT(ctx context.Context, id string, params *re
 
 	return &updatedSession, nil
 }
+
+// DeleteSession implements [repository.SessionRepository].
+func (r *sessionRepository) DeleteSession(ctx context.Context, id string) (*entity.Session, error) {
+	objectID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	result := r.db.Collection(sessionCollection).FindOneAndDelete(ctx, bson.M{"_id": objectID})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	var deletedSession entity.Session
+	if err := result.Decode(&deletedSession); err != nil {
+		return nil, err
+	}
+
+	return &deletedSession, nil
+}

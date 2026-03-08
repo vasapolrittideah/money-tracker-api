@@ -18,6 +18,10 @@ type SessionRepository interface {
 
 	// UpdateJWT replaces the token pair and their expiry times on an existing session.
 	UpdateJWT(ctx context.Context, id string, params *UpdateJWTParams) (*entity.Session, error)
+
+	// DeleteSession removes the Session with the given ID from the database
+	// and returns the deleted entity.
+	DeleteSession(ctx context.Context, id string) (*entity.Session, error)
 }
 
 // UpdateJWTParams holds the new token pair and expiry times.
