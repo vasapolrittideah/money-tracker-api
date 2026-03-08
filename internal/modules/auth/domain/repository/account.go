@@ -25,8 +25,9 @@ type AccountRepository interface {
 	// and returns the updated entity.
 	UpdateAccount(ctx context.Context, id string, params *UpdateAccountParams) (*entity.Account, error)
 
-	// DeleteAccount removes the Account with the given ID from the database.
-	DeleteAccount(ctx context.Context, id string) error
+	// DeleteAccount removes the Account with the given ID from the database
+	// and returns the deleted entity.
+	DeleteAccount(ctx context.Context, id string) (*entity.Account, error)
 }
 
 // UpdateAccountParams holds the optional fields that can be updated on an Account.
