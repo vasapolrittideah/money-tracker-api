@@ -33,6 +33,7 @@ type JWTConfig struct {
 	RefreshSecretKey string        `mapstructure:"JWT_REFRESH_SECRET"`
 	AccessExpiresIn  time.Duration `mapstructure:"JWT_ACCESS_EXPIRES_IN"`
 	RefreshExpiresIn time.Duration `mapstructure:"JWT_REFRESH_EXPIRES_IN"`
+	Issuer           string        `mapstructure:"JWT_ISSUER"`
 }
 
 // RedisConfig holds the connection details for Redis.
