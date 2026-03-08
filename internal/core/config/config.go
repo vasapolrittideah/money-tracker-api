@@ -10,9 +10,9 @@ import (
 // Config is the root configuration structure that aggregates all sub-configs
 // loaded from environment variables or a .env file.
 type Config struct {
-	App      AppConfig
-	Database DatabaseConfig
-	JWT      JWTConfig
+	App      AppConfig      `mapstructure:",squash"`
+	Database DatabaseConfig `mapstructure:",squash"`
+	JWT      JWTConfig      `mapstructure:",squash"`
 }
 
 // AppConfig holds general application settings.
