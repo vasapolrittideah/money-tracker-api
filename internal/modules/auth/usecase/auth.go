@@ -9,7 +9,6 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -50,7 +49,7 @@ func NewAuthUseCase(
 }
 
 // LoginWithEmail implements [usecase.AuthUseCase].
-func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginWithEmailParams) (*auth.JWT, error) {
+func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginWithEmailParams) (*usecase.AuthResponse, error) {
 	account, err := u.accountRepo.GetAccountByEmail(ctx, params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -72,7 +71,7 @@ func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginW
 }
 
 // Register implements [usecase.AuthUseCase].
-func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterParams) (*auth.JWT, error) {
+func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterParams) (*usecase.AuthResponse, error) {
 	hashedPassword, err := u.hasher.Hash(params.Password)
 	if err != nil {
 		return nil, err
@@ -104,7 +103,7 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 
 // createSession creates a new session for the given account ID and returns
 // the generated JWT tokens.
-func (u *authUseCase) createSession(ctx context.Context, accountID string) (*auth.JWT, error) {
+func (u *authUseCase) createSession(ctx context.Context, accountID string) (*usecase.AuthResponse, error) {
 	session, err := u.sessionRepo.CreateSession(ctx, &entity.Session{AccountID: accountID})
 	if err != nil {
 		return nil, err
@@ -140,7 +139,7 @@ func (u *authUseCase) createSession(ctx context.Context, accountID string) (*aut
 		return nil, err
 	}
 
-	return &auth.JWT{
+	return &usecase.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
@@ -151,7 +150,7 @@ func (u *authUseCase) createSession(ctx context.Context, accountID string) (*aut
 func (u *authUseCase) generateJWT(accountID, sessionID, secretKey string, expiresIn time.Duration) (string, error) {
 	now := time.Now()
 
-	claims := auth.JWTClaims{
+	claims := token.JWTClaims{
 		AccountID: accountID,
 		SessionID: sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
