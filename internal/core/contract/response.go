@@ -3,6 +3,8 @@ package contract
 import (
 	"net/http"
 	"time"
+
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 )
 
 // APIResponse is the standard envelope for all HTTP responses.
@@ -43,19 +45,21 @@ type APIErrorDetail struct {
 	Value any `json:"value,omitempty"`
 }
 
-// NewSuccessResponse creates an APIResponse with the given data payload and no error.
-func NewSuccessResponse(data any) APIResponse {
-	return APIResponse{
+// WriteSuccessResponse writes a successful API response with the given data.
+func WriteSuccessResponse(w http.ResponseWriter, data any) {
+	if err := utils.WriteJSON(w, http.StatusOK, APIResponse{
 		Data:      data,
 		Error:     nil,
 		Timestamp: time.Now(),
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-// NewErrorResponse creates an APIResponse with the given error code, message, and
-// optional field-level details. Data is always nil for error responses.
-func NewErrorResponse(status int, message string, details []APIErrorDetail) APIResponse {
-	return APIResponse{
+// WriteErrorResponse writes an error API response with the given status, message,
+// and optional field-level details.
+func WriteErrorResponse(w http.ResponseWriter, status int, message string, details []APIErrorDetail) {
+	if err := utils.WriteJSON(w, status, APIResponse{
 		Data: nil,
 		Error: &APIError{
 			Status:  status,
@@ -63,41 +67,47 @@ func NewErrorResponse(status int, message string, details []APIErrorDetail) APIR
 			Details: details,
 		},
 		Timestamp: time.Now(),
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-// NewValidationErrorResponse creates a BAD_REQUEST response populated with
-// field-level validation details.
-func NewValidationErrorResponse(details []APIErrorDetail) APIResponse {
-	return NewErrorResponse(http.StatusBadRequest, "Validation failed", details)
+// WriteValidationErrorResponse writes a 400 Bad Request response with validation error details.
+func WriteValidationErrorResponse(w http.ResponseWriter, details []APIErrorDetail) {
+	WriteErrorResponse(w, http.StatusBadRequest, "validation failed", details)
 }
 
-// NewNotFoundResponse creates a NOT_FOUND error response with the given message.
-func NewNotFoundResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusNotFound, message, nil)
+// WriteNotFoundResponse writes a 404 Not Found response with the given message.
+func WriteNotFoundResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusNotFound, message, nil)
 }
 
-// NewUnauthorizedResponse creates an UNAUTHORIZED error response with the given message.
-func NewUnauthorizedResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusUnauthorized, message, nil)
+// WriteUnauthorizedResponse writes a 401 Unauthorized response with the given message.
+func WriteUnauthorizedResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusUnauthorized, message, nil)
 }
 
-// NewForbiddenResponse creates a FORBIDDEN error response with the given message.
-func NewForbiddenResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusForbidden, message, nil)
+// WriteForbiddenResponse writes a 403 Forbidden response with the given message.
+func WriteForbiddenResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusForbidden, message, nil)
 }
 
-// NewPreconditionFailedResponse creates a PRECONDITION_FAILED error response with the given message.
-func NewPreconditionFailedResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusPreconditionFailed, message, nil)
+// WriteBadRequestResponse writes a 400 Bad Request response with the given message.
+func WriteBadRequestResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusBadRequest, message, nil)
 }
 
-// NewInternalErrorResponse creates an INTERNAL error response with the given message.
-func NewInternalErrorResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusInternalServerError, message, nil)
+// WritePreconditionFailedResponse writes a 412 Precondition Failed response with the given message.
+func WritePreconditionFailedResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusPreconditionFailed, message, nil)
 }
 
-// NewConflictResponse creates a CONFLICT error response with the given message.
-func NewConflictResponse(message string) APIResponse {
-	return NewErrorResponse(http.StatusConflict, message, nil)
+// WriteInternalErrorResponse writes a 500 Internal Server Error response with the given message.
+func WriteInternalErrorResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusInternalServerError, message, nil)
+}
+
+// WriteConflictResponse writes a 409 Conflict response with the given message.
+func WriteConflictResponse(w http.ResponseWriter, message string) {
+	WriteErrorResponse(w, http.StatusConflict, message, nil)
 }
