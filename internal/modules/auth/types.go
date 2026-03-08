@@ -13,8 +13,8 @@ type JWT struct {
 type JWTClaims struct {
 	jwt.RegisteredClaims
 
-	// UserID identifies the authenticated user this token was issued for.
-	UserID string `json:"user_id"`
+	// AccountID identifies the authenticated user this token was issued for.
+	AccountID string `json:"account_id"`
 
 	// SessionID ties the token to a specific session, allowing targeted revocation.
 	SessionID string `json:"session_id"`
