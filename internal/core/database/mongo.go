@@ -24,7 +24,7 @@ type MongoDB struct {
 
 // NewMongoDB creates a new MongoDB with the given configuration.
 // Call Connect to establish the actual connection before using the database.
-func NewMongoDB(cfg *config.DatabaseConfig) Database[*mongo.Database] {
+func NewMongoDB(cfg *config.DatabaseConfig) *MongoDB {
 	return &MongoDB{config: cfg}
 }
 
@@ -75,4 +75,21 @@ func (d *MongoDB) Disconnect(ctx context.Context) error {
 // GetDatabase returns the underlying *mongo.Database for direct collection access.
 func (d *MongoDB) GetDatabase() *mongo.Database {
 	return d.database
+}
+
+// WithTransaction executes fn inside a MongoDB multi-document transaction.
+// If fn returns an error the transaction is aborted and all writes are rolled
+// back; otherwise it is committed. The context passed to fn carries the active
+// session and must be forwarded to every repository operation inside fn.
+func (d *MongoDB) WithTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	session, err := d.client.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(ctx)
+
+	_, err = session.WithTransaction(ctx, func(sessCtx context.Context) (interface{}, error) {
+		return nil, fn(sessCtx)
+	})
+	return err
 }

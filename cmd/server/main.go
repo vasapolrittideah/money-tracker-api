@@ -51,17 +51,18 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	jwtMaker := token.NewJWTMaker(cfg.JWT.Issuer, cfg.JWT.Issuer)
-	bcryptHasher := hash.NewBcryptHasher(bcrypt.DefaultCost).(*hash.BcryptHasher)
-	cryptoHasher := hash.NewSHA256Hasher().(*hash.SHA256Hasher)
+	bcryptHasher := hash.NewBcryptHasher(bcrypt.DefaultCost)
+	cryptoHasher := hash.NewSHA256Hasher()
 
 	authHandler := auth_handler.NewAuthHandler(
 		auth_usecase.NewAuthUseCase(
 			auth_repo.NewAccountRepository(ctx, mongo.GetDatabase()),
 			auth_repo.NewIdentityRepository(mongo.GetDatabase()),
 			auth_repo.NewSessionRepository(mongo.GetDatabase()),
+			mongo,
 			jwtMaker,
-			*bcryptHasher,
-			*cryptoHasher,
+			bcryptHasher,
+			cryptoHasher,
 			cfg,
 		),
 	)
