@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
@@ -35,10 +36,20 @@ func (d *MongoDB) Connect(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, connectionTimeout)
 	defer cancel()
 
-	uri := "mongodb://" + d.config.Host + ":" + d.config.Port + "/" + d.config.Name + "?authSource=admin"
-	if d.config.User != "" && d.config.Password != "" {
-		uri = "mongodb://" + d.config.User + ":" + d.config.Password + "@" + d.config.Host + ":" + d.config.Port + "/" + d.config.Name + "?authSource=admin"
+	host := d.config.Host + ":" + d.config.Port
+	query := "authSource=admin&replicaSet=rs0&directConnection=true"
+
+	u := &url.URL{
+		Scheme:   "mongodb",
+		Host:     host,
+		Path:     d.config.Name,
+		RawQuery: query,
 	}
+	if d.config.User != "" && d.config.Password != "" {
+		u.User = url.UserPassword(d.config.User, d.config.Password)
+	}
+
+	uri := u.String()
 
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
 	if err != nil {
