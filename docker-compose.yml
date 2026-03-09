@@ -13,6 +13,8 @@ services:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - backend
 
   app:
     build:
