@@ -24,7 +24,7 @@ type authUseCase struct {
 	accountRepo  repository.AccountRepository
 	identityRepo repository.IdentityRepository
 	sessionRepo  repository.SessionRepository
-	jwtMaker     token.JWTMaker
+	jwtMaker     *token.JWTMaker
 	hasher       hash.Hasher
 	config       *config.Config
 }
@@ -34,7 +34,7 @@ func NewAuthUseCase(
 	accountRepo repository.AccountRepository,
 	identityRepo repository.IdentityRepository,
 	sessionRepo repository.SessionRepository,
-	jwtMaker token.JWTMaker,
+	jwtMaker *token.JWTMaker,
 	hasher hash.Hasher,
 	cfg *config.Config,
 ) usecase.AuthUseCase {

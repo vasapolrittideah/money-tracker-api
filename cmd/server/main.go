@@ -9,10 +9,17 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	auth_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/handler"
+	auth_router "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/router"
+	auth_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/repository"
+	auth_usecase "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/usecase"
 )
 
 func main() {
@@ -36,14 +43,30 @@ func main() {
 		}
 	}()
 
-	// jwtMaker := token.NewJWTMaker(cfg.JWT.Issuer, cfg.JWT.Issuer)
-
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	jwtMaker := token.NewJWTMaker(cfg.JWT.Issuer, cfg.JWT.Issuer)
+	bcrpytHasher := hash.NewBcryptHasher(bcrypt.DefaultCost)
+
+	authHandler := auth_handler.NewAuthHandler(
+		auth_usecase.NewAuthUseCase(
+			auth_repo.NewAccountRepository(ctx, mongo.GetDatabase()),
+			auth_repo.NewIdentityRepository(mongo.GetDatabase()),
+			auth_repo.NewSessionRepository(mongo.GetDatabase()),
+			jwtMaker,
+			bcrpytHasher,
+			cfg,
+		),
+	)
+
+	r.Route("/api/v1", func(r chi.Router) {
+		auth_router.RegisterRoutes(r, authHandler)
+	})
 
 	serverAddr := ":" + cfg.App.Port
 
@@ -53,10 +76,6 @@ func main() {
 		ReadTimeout:  30 * time.Second,
 		Handler:      r,
 	}
-
-	r.Route("/api/v1", func(r chi.Router) {
-
-	})
 
 	serverErrors := make(chan error, 1)
 
