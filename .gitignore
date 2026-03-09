@@ -232,11 +232,12 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,macos,windows,linux
 
-# Generated proto files
-*.pb.go
-
-# Tilt build
+# Build output
+bin/
 build/
+dist/
+target/
+tmp/
 
 # Cursor
 .cursorrules
