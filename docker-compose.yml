@@ -1,4 +1,8 @@
 services:
+  # Primary MongoDB instance running as a single-node replica set (rs0).
+  # A replica set is required to support multi-document transactions.
+  # The keyfile is copied to /tmp at startup so its ownership can be fixed
+  # to the 'mongodb' user, which mongod requires before it will accept the file.
   mongodb:
     image: mongo:7
     container_name: mongodb
@@ -13,9 +17,42 @@ services:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - mongodb_data:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile:ro
     networks:
       - backend
+    entrypoint: >
+      bash -c "cp /etc/mongo-keyfile /tmp/mongo-keyfile &&
+               chmod 400 /tmp/mongo-keyfile &&
+               chown mongodb:mongodb /tmp/mongo-keyfile &&
+               exec docker-entrypoint.sh mongod --replSet rs0 --bind_ip_all --keyFile /tmp/mongo-keyfile"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
+  # One-shot container that initialises the replica set by calling rs.initiate().
+  # It runs only after the mongodb healthcheck passes, then exits and is never restarted.
+  # Without this step mongod starts in replica-set mode but has no elected primary,
+  # so reads/writes and transactions would all fail.
+  mongo-init:
+    image: mongo:7
+    container_name: mongo-init
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - backend
+    env_file:
+      - .env
+    entrypoint: >
+      mongosh --host mongodb -u ${DB_USER} -p ${DB_PASSWORD} --authenticationDatabase admin --eval
+      "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]})"
+    restart: "no"
+
+  # The Go API server. It waits for mongodb to pass its healthcheck before
+  # starting, guaranteeing a primary is available when the app first connects.
   app:
     build:
       context: .
@@ -29,7 +66,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     networks:
       - backend
 

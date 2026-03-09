@@ -238,6 +238,7 @@ build/
 dist/
 target/
 tmp/
+mongo-keyfile
 
 # Cursor
 .cursorrules
