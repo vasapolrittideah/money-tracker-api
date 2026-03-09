@@ -10,7 +10,7 @@ type BcryptHasher struct {
 // NewBcryptHasher creates a new BcryptHasher with the given cost factor.
 // Higher cost values increase hashing time and resistance to brute-force attacks.
 // Pass bcrypt.DefaultCost if you don't have a specific requirement.
-func NewBcryptHasher(cost int) Hasher {
+func NewBcryptHasher(cost int) *BcryptHasher {
 	return &BcryptHasher{cost: cost}
 }
 

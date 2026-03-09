@@ -11,7 +11,7 @@ import (
 type SHA256Hasher struct{}
 
 // NewSHA256Hasher creates a new SHA256Hasher.
-func NewSHA256Hasher() Hasher {
+func NewSHA256Hasher() *SHA256Hasher {
 	return &SHA256Hasher{}
 }
 

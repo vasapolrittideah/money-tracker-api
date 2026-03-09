@@ -18,3 +18,11 @@ type Database[T any] interface {
 	// GetDatabase returns the underlying database client or reference for direct access.
 	GetDatabase() T
 }
+
+// Transactor defines the contract for running multiple operations atomically.
+// Implementations must roll back all changes if fn returns an error, and commit
+// them otherwise. The context passed into fn carries the active transaction
+// session and must be forwarded to every repository call inside fn.
+type Transactor interface {
+	WithTransaction(ctx context.Context, fn func(ctx context.Context) error) error
+}
