@@ -25,7 +25,8 @@ type authUseCase struct {
 	identityRepo repository.IdentityRepository
 	sessionRepo  repository.SessionRepository
 	jwtMaker     *token.JWTMaker
-	hasher       hash.Hasher
+	bcryptHasher hash.BcryptHasher
+	cryptoHasher hash.SHA256Hasher
 	config       *config.Config
 }
 
@@ -35,7 +36,8 @@ func NewAuthUseCase(
 	identityRepo repository.IdentityRepository,
 	sessionRepo repository.SessionRepository,
 	jwtMaker *token.JWTMaker,
-	hasher hash.Hasher,
+	bcryptHasher hash.BcryptHasher,
+	cryptoHasher hash.SHA256Hasher,
 	cfg *config.Config,
 ) usecase.AuthUseCase {
 	return &authUseCase{
@@ -43,7 +45,8 @@ func NewAuthUseCase(
 		identityRepo: identityRepo,
 		sessionRepo:  sessionRepo,
 		jwtMaker:     jwtMaker,
-		hasher:       hasher,
+		bcryptHasher: bcryptHasher,
+		cryptoHasher: cryptoHasher,
 		config:       cfg,
 	}
 }
@@ -59,7 +62,7 @@ func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginW
 		return nil, err
 	}
 
-	if ok := u.hasher.Verify(params.Password, account.HashedPassword); !ok {
+	if ok := u.bcryptHasher.Verify(params.Password, account.HashedPassword); !ok {
 		return nil, ErrInvalidCredentials
 	}
 
@@ -72,7 +75,7 @@ func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginW
 
 // Register implements [usecase.AuthUseCase].
 func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterParams) (*usecase.AuthResponse, error) {
-	hashedPassword, err := u.hasher.Hash(params.Password)
+	hashedPassword, err := u.bcryptHasher.Hash(params.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +132,15 @@ func (u *authUseCase) createSession(ctx context.Context, accountID string) (*use
 		return nil, err
 	}
 
+	hashedRefreshToken, err := u.cryptoHasher.Hash(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	if _, err := u.sessionRepo.UpdateJWT(ctx, session.ID.Hex(), &repository.UpdateJWTParams{
 		AccessToken:        accessToken,
-		RefreshToken:       refreshToken,
+		RefreshToken:       hashedRefreshToken,
 		AccessTokenExpiry:  now.Add(u.config.JWT.AccessExpiresIn),
 		RefreshTokenExpiry: now.Add(u.config.JWT.RefreshExpiresIn),
 	}); err != nil {
