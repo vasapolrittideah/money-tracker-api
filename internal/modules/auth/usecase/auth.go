@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
@@ -24,9 +25,10 @@ type authUseCase struct {
 	accountRepo  repository.AccountRepository
 	identityRepo repository.IdentityRepository
 	sessionRepo  repository.SessionRepository
+	transactor   database.Transactor
 	jwtMaker     *token.JWTMaker
-	bcryptHasher hash.BcryptHasher
-	cryptoHasher hash.SHA256Hasher
+	bcryptHasher *hash.BcryptHasher
+	cryptoHasher *hash.SHA256Hasher
 	config       *config.Config
 }
 
@@ -35,15 +37,17 @@ func NewAuthUseCase(
 	accountRepo repository.AccountRepository,
 	identityRepo repository.IdentityRepository,
 	sessionRepo repository.SessionRepository,
+	transactor database.Transactor,
 	jwtMaker *token.JWTMaker,
-	bcryptHasher hash.BcryptHasher,
-	cryptoHasher hash.SHA256Hasher,
+	bcryptHasher *hash.BcryptHasher,
+	cryptoHasher *hash.SHA256Hasher,
 	cfg *config.Config,
 ) usecase.AuthUseCase {
 	return &authUseCase{
 		accountRepo:  accountRepo,
 		identityRepo: identityRepo,
 		sessionRepo:  sessionRepo,
+		transactor:   transactor,
 		jwtMaker:     jwtMaker,
 		bcryptHasher: bcryptHasher,
 		cryptoHasher: cryptoHasher,
@@ -80,28 +84,36 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 		return nil, err
 	}
 
-	account, err := u.accountRepo.CreateAccount(ctx, &entity.Account{
-		Email:          params.Email,
-		HashedPassword: hashedPassword,
-	})
-	if err != nil {
-		if mongo.IsDuplicateKeyError(err) {
-			return nil, ErrAccountAlreadyExists
+	var accountID string
+
+	if err := u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
+		account, err := u.accountRepo.CreateAccount(ctx, &entity.Account{
+			Email:          params.Email,
+			HashedPassword: hashedPassword,
+		})
+		if err != nil {
+			if mongo.IsDuplicateKeyError(err) {
+				return ErrAccountAlreadyExists
+			}
+			return err
 		}
 
-		return nil, err
-	}
+		if _, err := u.identityRepo.CreateIdentity(ctx, &entity.Identity{
+			AccountID:  account.ID.Hex(),
+			Provider:   "email",
+			ProviderID: "",
+			Email:      account.Email,
+		}); err != nil {
+			return err
+		}
 
-	if _, err := u.identityRepo.CreateIdentity(ctx, &entity.Identity{
-		AccountID:  account.ID.Hex(),
-		Provider:   "email",
-		ProviderID: "",
-		Email:      account.Email,
+		accountID = account.ID.Hex()
+		return nil
 	}); err != nil {
 		return nil, err
 	}
 
-	return u.createSession(ctx, account.ID.Hex())
+	return u.createSession(ctx, accountID)
 }
 
 // createSession creates a new session for the given account ID and returns
