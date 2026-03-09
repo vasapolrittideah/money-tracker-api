@@ -119,42 +119,47 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 // createSession creates a new session for the given account ID and returns
 // the generated JWT tokens.
 func (u *authUseCase) createSession(ctx context.Context, accountID string) (*usecase.AuthResponse, error) {
-	session, err := u.sessionRepo.CreateSession(ctx, &entity.Session{AccountID: accountID})
-	if err != nil {
-		return nil, err
-	}
+	var accessToken, refreshToken string
 
-	accessToken, err := u.generateJWT(
-		accountID,
-		session.ID.Hex(),
-		u.config.JWT.AccessSecretKey,
-		u.config.JWT.AccessExpiresIn,
-	)
-	if err != nil {
-		return nil, err
-	}
+	if err := u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
+		session, err := u.sessionRepo.CreateSession(ctx, &entity.Session{AccountID: accountID})
+		if err != nil {
+			return err
+		}
 
-	refreshToken, err := u.generateJWT(
-		accountID,
-		session.ID.Hex(),
-		u.config.JWT.RefreshSecretKey,
-		u.config.JWT.RefreshExpiresIn,
-	)
-	if err != nil {
-		return nil, err
-	}
+		accessToken, err = u.generateJWT(
+			accountID,
+			session.ID.Hex(),
+			u.config.JWT.AccessSecretKey,
+			u.config.JWT.AccessExpiresIn,
+		)
+		if err != nil {
+			return err
+		}
 
-	hashedRefreshToken, err := u.cryptoHasher.Hash(refreshToken)
-	if err != nil {
-		return nil, err
-	}
+		refreshToken, err = u.generateJWT(
+			accountID,
+			session.ID.Hex(),
+			u.config.JWT.RefreshSecretKey,
+			u.config.JWT.RefreshExpiresIn,
+		)
+		if err != nil {
+			return err
+		}
 
-	now := time.Now()
-	if _, err := u.sessionRepo.UpdateJWT(ctx, session.ID.Hex(), &repository.UpdateJWTParams{
-		AccessToken:        accessToken,
-		RefreshToken:       hashedRefreshToken,
-		AccessTokenExpiry:  now.Add(u.config.JWT.AccessExpiresIn),
-		RefreshTokenExpiry: now.Add(u.config.JWT.RefreshExpiresIn),
+		hashedRefreshToken, err := u.cryptoHasher.Hash(refreshToken)
+		if err != nil {
+			return err
+		}
+
+		now := time.Now()
+		_, err = u.sessionRepo.UpdateJWT(ctx, session.ID.Hex(), &repository.UpdateJWTParams{
+			AccessToken:        accessToken,
+			RefreshToken:       hashedRefreshToken,
+			AccessTokenExpiry:  now.Add(u.config.JWT.AccessExpiresIn),
+			RefreshTokenExpiry: now.Add(u.config.JWT.RefreshExpiresIn),
+		})
+		return err
 	}); err != nil {
 		return nil, err
 	}
