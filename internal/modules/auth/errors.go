@@ -3,6 +3,6 @@ package auth
 import "errors"
 
 var (
-	ErrAccountAlreadyExists = errors.New("account with the given email already exists")
-	ErrInvalidCredentials   = errors.New("invalid email or password")
+	ErrAccountAlreadyExists = errors.New("บัญชีนี้มีอยู่แล้ว")
+	ErrInvalidCredentials   = errors.New("อีเมลหรือรหัสผ่านไม่ถูกต้อง")
 )
