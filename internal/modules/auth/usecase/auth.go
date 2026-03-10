@@ -10,15 +10,11 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-)
-
-var (
-	ErrAccountAlreadyExists = errors.New("account with the given email already exists")
-	ErrInvalidCredentials   = errors.New("invalid email or password")
 )
 
 type authUseCase struct {
@@ -60,14 +56,14 @@ func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginW
 	account, err := u.accountRepo.GetAccountByEmail(ctx, params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, ErrInvalidCredentials
+			return nil, auth.ErrInvalidCredentials
 		}
 
 		return nil, err
 	}
 
 	if ok := u.bcryptHasher.Verify(params.Password, account.HashedPassword); !ok {
-		return nil, ErrInvalidCredentials
+		return nil, auth.ErrInvalidCredentials
 	}
 
 	if err := u.identityRepo.UpdateLastLogin(ctx, account.ID.Hex()); err != nil {
@@ -93,7 +89,7 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 		})
 		if err != nil {
 			if mongo.IsDuplicateKeyError(err) {
-				return ErrAccountAlreadyExists
+				return auth.ErrAccountAlreadyExists
 			}
 			return err
 		}
