@@ -30,6 +30,7 @@ func NewMailer(cfg *config.SMTPConfig) *Mailer {
 		cfg.Username,
 		cfg.Password,
 	)
+	dialer.SSL = true
 
 	return &Mailer{config: cfg, dialer: dialer}
 }
