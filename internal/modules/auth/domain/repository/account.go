@@ -35,6 +35,7 @@ type AccountRepository interface {
 type UpdateAccountParams struct {
 	Email          *string
 	HashedPassword *string
+	Verified       *bool
 }
 
 // FilterAccountsParams specifies filtering, pagination, and sorting options

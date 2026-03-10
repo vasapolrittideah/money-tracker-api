@@ -12,15 +12,7 @@ type Account struct {
 	ID             bson.ObjectID `bson:"_id,omitempty"`
 	Email          string        `bson:"email"`
 	HashedPassword string        `bson:"hashed_password"`
+	Verified       bool          `bson:"verified"`
 	CreatedAt      time.Time     `bson:"created_at"`
 	UpdatedAt      time.Time     `bson:"updated_at"`
-
-	// Verified indicates whether the user has confirmed their email address.
-	Verified bool `bson:"verified"`
-
-	// EmailVerificationToken is the one-time token sent to the user's inbox.
-	EmailVerificationToken string `bson:"email_verification_token,omitempty"`
-
-	// EmailVerificationExpiry is when the verification token becomes invalid.
-	EmailVerificationExpiry time.Time `bson:"email_verification_expiry,omitempty"`
 }
