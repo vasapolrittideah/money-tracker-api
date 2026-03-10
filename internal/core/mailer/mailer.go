@@ -7,6 +7,9 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
+// Email holds all the fields needed to compose and send an email message.
+// Either Body or HTMLBody must be set. If both are provided, HTMLBody is used
+// as the primary content and Body is added as a plain-text alternative.
 type Email struct {
 	To          []string
 	Cc          []string
@@ -18,11 +21,15 @@ type Email struct {
 	Embeds      []string
 }
 
+// Mailer wraps gomail.Dialer and provides higher-level methods for sending emails
+// via SMTP. It is configured once at startup and reused across the application.
 type Mailer struct {
 	config *config.SMTPConfig
 	dialer *gomail.Dialer
 }
 
+// NewMailer creates a new Mailer using the given SMTP configuration.
+// It establishes the dialer with SSL enabled (port 465).
 func NewMailer(cfg *config.SMTPConfig) *Mailer {
 	dialer := gomail.NewDialer(
 		cfg.Host,
@@ -35,6 +42,8 @@ func NewMailer(cfg *config.SMTPConfig) *Mailer {
 	return &Mailer{config: cfg, dialer: dialer}
 }
 
+// Send opens a new SMTP connection, sends a single email, and closes the connection.
+// Returns an error if To is empty or if the SMTP transaction fails.
 func (m *Mailer) Send(email Email) error {
 	if len(email.To) == 0 {
 		return fmt.Errorf("no recipients specified")
@@ -46,6 +55,9 @@ func (m *Mailer) Send(email Email) error {
 	return m.dialer.DialAndSend(msg)
 }
 
+// SendBulk sends multiple emails over a single persistent SMTP connection,
+// which is more efficient than calling Send repeatedly. The connection is closed
+// after all emails are sent or on the first failure.
 func (m *Mailer) SendBulk(emails []Email) error {
 	sender, err := m.dialer.Dial()
 	if err != nil {
@@ -67,6 +79,7 @@ func (m *Mailer) SendBulk(emails []Email) error {
 	return nil
 }
 
+// SendSimple is a convenience wrapper around Send for plain-text emails.
 func (m *Mailer) SendSimple(to []string, subject, body string) error {
 	return m.Send(Email{
 		To:      to,
@@ -75,6 +88,7 @@ func (m *Mailer) SendSimple(to []string, subject, body string) error {
 	})
 }
 
+// SendHTML is a convenience wrapper around Send for HTML-only emails.
 func (m *Mailer) SendHTML(to []string, subject, htmlBody string) error {
 	return m.Send(Email{
 		To:       to,
@@ -83,6 +97,8 @@ func (m *Mailer) SendHTML(to []string, subject, htmlBody string) error {
 	})
 }
 
+// SendWithAttachment is a convenience wrapper around Send for plain-text emails
+// with one or more file attachments.
 func (m *Mailer) SendWithAttachment(to []string, subject, body string, attachments []string) error {
 	return m.Send(Email{
 		To:          to,
@@ -92,6 +108,8 @@ func (m *Mailer) SendWithAttachment(to []string, subject, body string, attachmen
 	})
 }
 
+// setEmailMessage populates a gomail.Message with the fields from an Email struct,
+// including headers, body content, attachments, and embedded images.
 func (m *Mailer) setEmailMessage(msg *gomail.Message, email Email) {
 	// Set headers
 	msg.SetHeader("From", m.config.From)
