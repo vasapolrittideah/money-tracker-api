@@ -13,6 +13,7 @@ type Config struct {
 	App      AppConfig      `mapstructure:",squash"`
 	Database DatabaseConfig `mapstructure:",squash"`
 	JWT      JWTConfig      `mapstructure:",squash"`
+	SMTP     SMTPConfig     `mapstructure:",squash"`
 }
 
 // AppConfig holds general application settings.
@@ -37,6 +38,15 @@ type JWTConfig struct {
 	AccessExpiresIn  time.Duration `mapstructure:"JWT_ACCESS_EXPIRES_IN"`
 	RefreshExpiresIn time.Duration `mapstructure:"JWT_REFRESH_EXPIRES_IN"`
 	Issuer           string        `mapstructure:"JWT_ISSUER"`
+}
+
+// SMTPConfig holds the connection details for the SMTP server used to send emails.
+type SMTPConfig struct {
+	Host     string `env:"SMTP_HOST"`
+	Port     int    `env:"SMTP_PORT"`
+	Username string `env:"SMTP_USERNAME"`
+	Password string `env:"SMTP_PASSWORD"`
+	From     string `env:"SMTP_FROM"`
 }
 
 // RedisConfig holds the connection details for Redis.
