@@ -15,9 +15,10 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	auth_delivery "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery"
 	auth_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/handler"
-	auth_router "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/router"
 	auth_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/repository"
 	auth_usecase "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/usecase"
 )
@@ -53,12 +54,18 @@ func main() {
 	jwtMaker := token.NewJWTMaker(cfg.JWT.Issuer, cfg.JWT.Issuer)
 	bcryptHasher := hash.NewBcryptHasher(bcrypt.DefaultCost)
 	cryptoHasher := hash.NewSHA256Hasher()
+	mailer := mailer.NewMailer(&cfg.SMTP)
+
+	accountRepo := auth_repo.NewAccountRepository(ctx, mongo.GetDatabase())
+	identityRepo := auth_repo.NewIdentityRepository(mongo.GetDatabase())
+	sessionRepo := auth_repo.NewSessionRepository(mongo.GetDatabase())
+	emailVerificationRepo := auth_repo.NewEmailVerificationRepository(ctx, mongo.GetDatabase())
 
 	authHandler := auth_handler.NewAuthHandler(
 		auth_usecase.NewAuthUseCase(
-			auth_repo.NewAccountRepository(ctx, mongo.GetDatabase()),
-			auth_repo.NewIdentityRepository(mongo.GetDatabase()),
-			auth_repo.NewSessionRepository(mongo.GetDatabase()),
+			accountRepo,
+			identityRepo,
+			sessionRepo,
 			mongo,
 			jwtMaker,
 			bcryptHasher,
@@ -66,9 +73,17 @@ func main() {
 			cfg,
 		),
 	)
+	emailVerificationHandler := auth_handler.NewEmailVerificationHandler(
+		auth_usecase.NewEmailVerificationUseCase(
+			accountRepo,
+			emailVerificationRepo,
+			mailer,
+			cryptoHasher,
+		),
+	)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		auth_router.RegisterRoutes(r, authHandler)
+		auth_delivery.RegisterRoutes(r, authHandler, emailVerificationHandler)
 	})
 
 	serverAddr := ":" + cfg.App.Port
