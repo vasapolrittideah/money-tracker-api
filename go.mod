@@ -3,6 +3,7 @@ module github.com/vasapolrittideah/money-tracker-api
 go 1.26.1
 
 require (
+	github.com/aws/smithy-go v1.24.2
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -16,7 +17,6 @@ require (
 )
 
 require (
-	github.com/aws/smithy-go v1.24.2 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
