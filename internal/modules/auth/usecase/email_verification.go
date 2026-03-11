@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/aws/smithy-go/ptr"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
@@ -22,6 +23,7 @@ import (
 type emailVerificationUseCase struct {
 	accountRepo           repository.AccountRepository
 	emailVerificationRepo repository.EmailVerificationRepository
+	transactor            database.Transactor
 	mailer                *mailer.Mailer
 	cryptoHasher          *hash.SHA256Hasher
 }
@@ -29,12 +31,14 @@ type emailVerificationUseCase struct {
 func NewEmailVerificationUseCase(
 	accountRepo repository.AccountRepository,
 	emailVerificationRepo repository.EmailVerificationRepository,
+	transactor database.Transactor,
 	cryptoHasher *hash.SHA256Hasher,
 	m *mailer.Mailer,
 ) usecase.EmailVerificationUseCase {
 	return &emailVerificationUseCase{
 		accountRepo:           accountRepo,
 		emailVerificationRepo: emailVerificationRepo,
+		transactor:            transactor,
 		cryptoHasher:          cryptoHasher,
 		mailer:                m,
 	}
@@ -50,10 +54,6 @@ func (u *emailVerificationUseCase) SendValidationEmail(ctx context.Context, para
 		return err
 	}
 
-	if err := u.emailVerificationRepo.InvalidateAllForAccount(ctx, params.AccountID); err != nil {
-		return err
-	}
-
 	code, hashedCode, err := u.generateVerificationCode()
 	if err != nil {
 		return err
@@ -65,7 +65,17 @@ func (u *emailVerificationUseCase) SendValidationEmail(ctx context.Context, para
 		ExpiresAt:  time.Now().Add(24 * time.Hour),
 	}
 
-	if _, err := u.emailVerificationRepo.Create(ctx, verification); err != nil {
+	if err := u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
+		if err := u.emailVerificationRepo.InvalidateAllForAccount(ctx, params.AccountID); err != nil {
+			return err
+		}
+
+		if _, err := u.emailVerificationRepo.Create(ctx, verification); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
 		return err
 	}
 
@@ -112,17 +122,19 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 		return auth.ErrEmailVerificationInvalid
 	}
 
-	if err := u.emailVerificationRepo.MarkAsUsed(ctx, verification.ID); err != nil {
-		return err
-	}
+	return u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
+		if err := u.emailVerificationRepo.MarkAsUsed(ctx, verification.ID); err != nil {
+			return err
+		}
 
-	if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &repository.UpdateAccountParams{
-		Verified: ptr.Bool(true),
-	}); err != nil {
-		return err
-	}
+		if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &repository.UpdateAccountParams{
+			Verified: ptr.Bool(true),
+		}); err != nil {
+			return err
+		}
 
-	return nil
+		return nil
+	})
 }
 
 // ChangeEmail implements [usecase.EmailVerificationUseCase].
