@@ -8,6 +8,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/aws/smithy-go/ptr"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
@@ -112,6 +113,12 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 	}
 
 	if err := u.emailVerificationRepo.MarkAsUsed(ctx, verification.ID); err != nil {
+		return err
+	}
+
+	if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &repository.UpdateAccountParams{
+		Verified: ptr.Bool(true),
+	}); err != nil {
 		return err
 	}
 

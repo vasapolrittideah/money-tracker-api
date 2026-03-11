@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	github.com/aws/smithy-go v1.24.2 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
