@@ -10,6 +10,7 @@ import (
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
@@ -72,14 +73,14 @@ func (u *emailVerificationUseCase) SendValidationEmail(ctx context.Context, para
 	<p>Thank you for registering with Money Tracker!</p>
 	<p>Please use the verification code below to verify your email address:</p>
 
-	<h2 style="letter-spacing: 8px; font-size: 32px; text-align: center; color: #4F46E5;">%s</h2>
+	<h2 style="letter-spacing: 8px; font-size: 32px; text-align: center; color: #7D52F4;">%s</h2>
 
 	<p>This code will expire in <strong>%s</strong>.</p>
 	<p>If you did not create an account, you can safely ignore this email.</p>
 
 	<p>Thank you,</p>
 	<p>Money Tracker Team</p>
-	`, code, time.Until(verification.ExpiresAt).Round(time.Minute).String())
+	`, code, utils.FormatDuration(time.Until(verification.ExpiresAt)))
 
 	if err := u.mailer.SendHTML([]string{account.Email}, "Verify your email", htmlBody); err != nil {
 		return err
