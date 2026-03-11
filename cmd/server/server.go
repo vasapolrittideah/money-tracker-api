@@ -64,8 +64,8 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 		auth_usecase.NewEmailVerificationUseCase(
 			accountRepo,
 			emailVerificationRepo,
-			m,
 			cryptoHasher,
+			m,
 		),
 	)
 

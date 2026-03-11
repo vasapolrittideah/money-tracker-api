@@ -27,14 +27,14 @@ type emailVerificationUseCase struct {
 func NewEmailVerificationUseCase(
 	accountRepo repository.AccountRepository,
 	emailVerificationRepo repository.EmailVerificationRepository,
-	mailer *mailer.Mailer,
 	cryptoHasher *hash.SHA256Hasher,
+	m *mailer.Mailer,
 ) usecase.EmailVerificationUseCase {
 	return &emailVerificationUseCase{
 		accountRepo:           accountRepo,
 		emailVerificationRepo: emailVerificationRepo,
-		mailer:                mailer,
 		cryptoHasher:          cryptoHasher,
+		mailer:                m,
 	}
 }
 
@@ -45,7 +45,6 @@ func (u *emailVerificationUseCase) SendValidationEmail(ctx context.Context, para
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return auth.ErrAccountNotFound
 		}
-
 		return err
 	}
 
@@ -96,7 +95,6 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return auth.ErrEmailVerificationNotFound
 		}
-
 		return err
 	}
 
@@ -117,6 +115,34 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 	}
 
 	return nil
+}
+
+// ChangeEmail implements [usecase.EmailVerificationUseCase].
+func (u *emailVerificationUseCase) ChangeEmail(ctx context.Context, params *usecase.ChangeEmailParams) error {
+	if params.OldEmail == params.NewEmail {
+		return auth.ErrEmailUnchanged
+	}
+
+	account, err := u.accountRepo.GetAccountByEmail(ctx, params.OldEmail)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return auth.ErrAccountNotFound
+		}
+		return err
+	}
+
+	account.Email = params.NewEmail
+
+	update := &repository.UpdateAccountParams{
+		Email: &account.Email,
+	}
+	if _, err := u.accountRepo.UpdateAccount(ctx, account.ID.Hex(), update); err != nil {
+		return err
+	}
+
+	return u.SendValidationEmail(ctx, &usecase.SendValidationEmailParams{
+		AccountID: account.ID.Hex(),
+	})
 }
 
 func (u *emailVerificationUseCase) generateVerificationCode() (string, string, error) {

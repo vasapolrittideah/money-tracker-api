@@ -13,6 +13,11 @@ type EmailVerificationUseCase interface {
 	// the account as verified. Returns an error if the code is incorrect, expired,
 	// or has already been used.
 	VerifyEmail(ctx context.Context, params *VerifyEmailParams) error
+
+	// ChangeEmail changes the email address associated with the account and initiates
+	// a new verification process. It invalidates any existing verification records
+	// and sends a new code to the new email address.
+	ChangeEmail(ctx context.Context, params *ChangeEmailParams) error
 }
 
 // SendValidationEmailParams holds the parameters required to send a validation email.
@@ -24,4 +29,9 @@ type SendValidationEmailParams struct {
 type VerifyEmailParams struct {
 	AccountID string `json:"account_id" validate:"required"`
 	Code      string `json:"code" validate:"required"`
+}
+
+type ChangeEmailParams struct {
+	OldEmail string `json:"old_email" validate:"required,email"`
+	NewEmail string `json:"new_email" validate:"required,email"`
 }

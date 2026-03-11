@@ -13,4 +13,5 @@ var (
 	ErrEmailVerificationExpired  = errors.New("รหัสยืนยันอีเมลหมดอายุ")
 	ErrEmailVerificationUsed     = errors.New("รหัสยืนยันอีเมลถูกใช้งานแล้ว")
 	ErrEmailVerificationInvalid  = errors.New("รหัสยืนยันอีเมลไม่ถูกต้อง")
+	ErrEmailUnchanged            = errors.New("อีเมลใหม่ต้องแตกต่างจากอีเมลเดิม")
 )
