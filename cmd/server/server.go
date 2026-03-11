@@ -86,7 +86,7 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 
 // Start begins accepting HTTP connections. It blocks until the server stops.
 func (s *Server) Start() error {
-	logger.Logger.Info().Str("addr", s.httpServer.Addr).Msg("starting HTTP server")
+	logger.Log.Info().Str("addr", s.httpServer.Addr).Msg("starting HTTP server")
 	return s.httpServer.ListenAndServe()
 }
 

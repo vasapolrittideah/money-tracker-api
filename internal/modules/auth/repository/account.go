@@ -30,7 +30,7 @@ func NewAccountRepository(ctx context.Context, db *mongo.Database) repository.Ac
 	}
 
 	if _, err := collection.Indexes().CreateMany(ctx, indexes); err != nil {
-		logger.Logger.Error().Err(err).Msg("failed to create indexes for accounts collection")
+		logger.Log.Error().Err(err).Msg("failed to create indexes for accounts collection")
 	}
 
 	return &accountRepository{db: db}

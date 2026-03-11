@@ -36,7 +36,7 @@ func NewEmailVerificationRepository(ctx context.Context, db *mongo.Database) rep
 	}
 
 	if _, err := collection.Indexes().CreateMany(ctx, indexes); err != nil {
-		logger.Logger.Error().Err(err).Msg("failed to create indexes for email_verifications collection")
+		logger.Log.Error().Err(err).Msg("failed to create indexes for email_verifications collection")
 	}
 
 	return &emailVerificationRepository{db: db}

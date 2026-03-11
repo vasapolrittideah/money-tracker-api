@@ -63,7 +63,7 @@ func (d *MongoDB) Connect(ctx context.Context) error {
 		return err
 	}
 
-	logger.Logger.Info().Msg("Successfully connected to MongoDB")
+	logger.Log.Info().Msg("Successfully connected to MongoDB")
 
 	return nil
 }
@@ -78,7 +78,7 @@ func (d *MongoDB) Disconnect(ctx context.Context) error {
 		return err
 	}
 
-	logger.Logger.Info().Msg("Successfully disconnected from MongoDB")
+	logger.Log.Info().Msg("Successfully disconnected from MongoDB")
 
 	return nil
 }
