@@ -79,3 +79,35 @@ func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Re
 
 	contract.WriteSuccessResponse(w, nil)
 }
+
+func (h *EmailVerificationHandler) ChangeEmail(w http.ResponseWriter, r *http.Request) {
+	var req usecase.ChangeEmailParams
+	if err := utils.ReadJSON(w, r, &req); err != nil {
+		contract.WriteBadRequestResponse(w, "invalid request payload")
+		return
+	}
+
+	if errs := validator.ValidateStruct(req); errs != nil {
+		contract.WriteValidationErrorResponse(w, errs)
+		return
+	}
+
+	err := h.emailVerificationUC.ChangeEmail(r.Context(), &req)
+	if err != nil {
+		switch err {
+		case auth.ErrAccountNotFound:
+			contract.WriteNotFoundResponse(w, err.Error())
+			return
+
+		case auth.ErrEmailUnchanged:
+			contract.WriteBadRequestResponse(w, err.Error())
+			return
+
+		default:
+			contract.WriteInternalErrorResponse(w, err.Error())
+			return
+		}
+	}
+
+	contract.WriteSuccessResponse(w, nil)
+}
