@@ -44,8 +44,8 @@ func NewEmailVerificationUseCase(
 	}
 }
 
-// SendValidationEmail implements [usecase.EmailVerificationUseCase].
-func (u *emailVerificationUseCase) SendValidationEmail(ctx context.Context, params *usecase.SendValidationEmailParams) error {
+// SendVerificationEmail implements [usecase.EmailVerificationUseCase].
+func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context, params *usecase.SendVerificationEmailParams) error {
 	account, err := u.accountRepo.GetAccountByID(ctx, params.AccountID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -160,7 +160,7 @@ func (u *emailVerificationUseCase) ChangeEmail(ctx context.Context, params *usec
 		return err
 	}
 
-	return u.SendValidationEmail(ctx, &usecase.SendValidationEmailParams{
+	return u.SendVerificationEmail(ctx, &usecase.SendVerificationEmailParams{
 		AccountID: account.ID.Hex(),
 	})
 }

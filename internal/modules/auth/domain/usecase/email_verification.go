@@ -4,10 +4,10 @@ import "context"
 
 // EmailVerificationUseCase defines the application-level operations for email verification.
 type EmailVerificationUseCase interface {
-	// SendValidationEmail generates a one-time verification code, stores its hash,
+	// SendVerificationEmail generates a one-time verification code, stores its hash,
 	// and sends the plain-text code to the account's email address.
 	// Any previously active verification records for the account are invalidated first.
-	SendValidationEmail(ctx context.Context, params *SendValidationEmailParams) error
+	SendVerificationEmail(ctx context.Context, params *SendVerificationEmailParams) error
 
 	// VerifyEmail validates the submitted code against the stored hash and marks
 	// the account as verified. Returns an error if the code is incorrect, expired,
@@ -20,8 +20,8 @@ type EmailVerificationUseCase interface {
 	ChangeEmail(ctx context.Context, params *ChangeEmailParams) error
 }
 
-// SendValidationEmailParams holds the parameters required to send a validation email.
-type SendValidationEmailParams struct {
+// SendVerificationEmailParams holds the parameters required to send a verification email.
+type SendVerificationEmailParams struct {
 	AccountID string `json:"account_id" validate:"required"`
 }
 
