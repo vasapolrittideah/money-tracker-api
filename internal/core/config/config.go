@@ -42,11 +42,11 @@ type JWTConfig struct {
 
 // SMTPConfig holds the connection details for the SMTP server used to send emails.
 type SMTPConfig struct {
-	Host     string `env:"SMTP_HOST"`
-	Port     int    `env:"SMTP_PORT"`
-	Username string `env:"SMTP_USERNAME"`
-	Password string `env:"SMTP_PASSWORD"`
-	From     string `env:"SMTP_FROM"`
+	Host     string `mapstructure:"SMTP_HOST"`
+	Port     int    `mapstructure:"SMTP_PORT"`
+	Username string `mapstructure:"SMTP_USERNAME"`
+	Password string `mapstructure:"SMTP_PASSWORD"`
+	From     string `mapstructure:"SMTP_FROM"`
 }
 
 // RedisConfig holds the connection details for Redis.
