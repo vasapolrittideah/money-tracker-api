@@ -41,7 +41,7 @@ func (h *EmailVerificationHandler) SendVerificationEmail(w http.ResponseWriter, 
 			return
 		}
 
-		contract.WriteInternalErrorResponse(w, err.Error())
+		contract.WriteInternalErrorResponse(w)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Re
 			return
 
 		default:
-			contract.WriteInternalErrorResponse(w, err.Error())
+			contract.WriteInternalErrorResponse(w)
 			return
 		}
 	}
@@ -104,7 +104,7 @@ func (h *EmailVerificationHandler) ChangeEmail(w http.ResponseWriter, r *http.Re
 			return
 
 		default:
-			contract.WriteInternalErrorResponse(w, err.Error())
+			contract.WriteInternalErrorResponse(w)
 			return
 		}
 	}

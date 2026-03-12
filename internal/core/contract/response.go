@@ -102,9 +102,9 @@ func WritePreconditionFailedResponse(w http.ResponseWriter, message string) {
 	WriteErrorResponse(w, http.StatusPreconditionFailed, message, nil)
 }
 
-// WriteInternalErrorResponse writes a 500 Internal Server Error response with the given message.
-func WriteInternalErrorResponse(w http.ResponseWriter, message string) {
-	WriteErrorResponse(w, http.StatusInternalServerError, message, nil)
+// WriteInternalErrorResponse writes a 500 Internal Server Error response with a generic message.
+func WriteInternalErrorResponse(w http.ResponseWriter) {
+	WriteErrorResponse(w, http.StatusInternalServerError, "something went wrong", nil)
 }
 
 // WriteConflictResponse writes a 409 Conflict response with the given message.

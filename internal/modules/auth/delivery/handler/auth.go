@@ -41,7 +41,7 @@ func (h *AuthHandler) LoginWithEmail(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		contract.WriteInternalErrorResponse(w, err.Error())
+		contract.WriteInternalErrorResponse(w)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		contract.WriteInternalErrorResponse(w, err.Error())
+		contract.WriteInternalErrorResponse(w)
 		return
 	}
 
