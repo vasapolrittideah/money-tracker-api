@@ -12,8 +12,12 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
+	core_middleware "github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	account_delivery "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/delivery"
+	account_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/delivery/handler"
 	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/repository"
+	account_usecase "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/usecase"
 	auth_delivery "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery"
 	auth_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/handler"
 	auth_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/repository"
@@ -60,7 +64,6 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 			cfg,
 		),
 	)
-
 	emailVerificationHandler := auth_handler.NewEmailVerificationHandler(
 		auth_usecase.NewEmailVerificationUseCase(
 			accountRepo,
@@ -70,9 +73,18 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 			m,
 		),
 	)
+	accountHandler := account_handler.NewAccountHandler(
+		account_usecase.NewAccountUseCase(accountRepo),
+	)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		auth_delivery.RegisterRoutes(r, authHandler, emailVerificationHandler)
+
+		// Protected routes that require authentication
+		r.Group(func(r chi.Router) {
+			r.Use(core_middleware.RequireAuth(jwtMaker, cfg.JWT.AccessSecretKey))
+			account_delivery.RegisterRoutes(r, accountHandler)
+		})
 	})
 
 	httpServer := &http.Server{
