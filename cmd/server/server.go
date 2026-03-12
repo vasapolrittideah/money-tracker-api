@@ -13,6 +13,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/repository"
 	auth_delivery "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery"
 	auth_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/delivery/handler"
 	auth_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/repository"
@@ -35,7 +36,7 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 	cryptoHasher := hash.NewSHA256Hasher()
 	m := mailer.NewMailer(&cfg.SMTP)
 
-	accountRepo := auth_repo.NewAccountRepository(ctx, db.GetDatabase())
+	accountRepo := account_repo.NewAccountRepository(ctx, db.GetDatabase())
 	identityRepo := auth_repo.NewIdentityRepository(db.GetDatabase())
 	sessionRepo := auth_repo.NewSessionRepository(db.GetDatabase())
 	emailVerificationRepo := auth_repo.NewEmailVerificationRepository(ctx, db.GetDatabase())

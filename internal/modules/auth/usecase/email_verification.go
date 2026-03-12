@@ -13,6 +13,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
+	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
@@ -21,7 +22,7 @@ import (
 )
 
 type emailVerificationUseCase struct {
-	accountRepo           repository.AccountRepository
+	accountRepo           account_repo.AccountRepository
 	emailVerificationRepo repository.EmailVerificationRepository
 	transactor            database.Transactor
 	mailer                *mailer.Mailer
@@ -29,7 +30,7 @@ type emailVerificationUseCase struct {
 }
 
 func NewEmailVerificationUseCase(
-	accountRepo repository.AccountRepository,
+	accountRepo account_repo.AccountRepository,
 	emailVerificationRepo repository.EmailVerificationRepository,
 	transactor database.Transactor,
 	cryptoHasher *hash.SHA256Hasher,
@@ -127,7 +128,7 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 			return err
 		}
 
-		if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &repository.UpdateAccountParams{
+		if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &account_repo.UpdateAccountParams{
 			Verified: ptr.Bool(true),
 		}); err != nil {
 			return err
@@ -153,7 +154,7 @@ func (u *emailVerificationUseCase) ChangeEmail(ctx context.Context, params *usec
 
 	account.Email = params.NewEmail
 
-	update := &repository.UpdateAccountParams{
+	update := &account_repo.UpdateAccountParams{
 		Email: &account.Email,
 	}
 	if _, err := u.accountRepo.UpdateAccount(ctx, account.ID.Hex(), update); err != nil {

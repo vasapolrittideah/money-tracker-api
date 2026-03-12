@@ -10,6 +10,8 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
+	account_entity "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/entity"
+	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
@@ -18,7 +20,7 @@ import (
 )
 
 type authUseCase struct {
-	accountRepo  repository.AccountRepository
+	accountRepo  account_repo.AccountRepository
 	identityRepo repository.IdentityRepository
 	sessionRepo  repository.SessionRepository
 	transactor   database.Transactor
@@ -30,7 +32,7 @@ type authUseCase struct {
 
 // NewAuthUseCase returns a new AuthUseCase with the given dependencies.
 func NewAuthUseCase(
-	accountRepo repository.AccountRepository,
+	accountRepo account_repo.AccountRepository,
 	identityRepo repository.IdentityRepository,
 	sessionRepo repository.SessionRepository,
 	transactor database.Transactor,
@@ -83,7 +85,7 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 	var accountID string
 
 	if err := u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
-		account, err := u.accountRepo.CreateAccount(ctx, &entity.Account{
+		account, err := u.accountRepo.CreateAccount(ctx, &account_entity.Account{
 			Email:          params.Email,
 			HashedPassword: hashedPassword,
 		})

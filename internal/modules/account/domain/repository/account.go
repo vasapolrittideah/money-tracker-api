@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
+	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/entity"
 )
 
 // AccountRepository defines persistence operations for Account entities.

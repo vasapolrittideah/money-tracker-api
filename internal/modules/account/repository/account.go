@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
+	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/entity"
+	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
