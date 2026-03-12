@@ -8,12 +8,18 @@ import (
 func RegisterRoutes(
 	r chi.Router,
 	authHandler *handler.AuthHandler,
-	emailVerificationHandler *handler.EmailVerificationHandler,
 ) {
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/login/email", authHandler.LoginWithEmail)
 		r.Post("/register", authHandler.Register)
+	})
+}
 
+func RegisterProtectedRoutes(
+	r chi.Router,
+	emailVerificationHandler *handler.EmailVerificationHandler,
+) {
+	r.Route("/auth", func(r chi.Router) {
 		r.Route("/email", func(r chi.Router) {
 			r.Post("/send-verification", emailVerificationHandler.SendVerificationEmail)
 			r.Post("/verify", emailVerificationHandler.VerifyEmail)

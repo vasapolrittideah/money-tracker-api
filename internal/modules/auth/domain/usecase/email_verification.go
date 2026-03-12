@@ -7,7 +7,7 @@ type EmailVerificationUseCase interface {
 	// SendVerificationEmail generates a one-time verification code, stores its hash,
 	// and sends the plain-text code to the account's email address.
 	// Any previously active verification records for the account are invalidated first.
-	SendVerificationEmail(ctx context.Context, params *SendVerificationEmailParams) error
+	SendVerificationEmail(ctx context.Context) error
 
 	// VerifyEmail validates the submitted code against the stored hash and marks
 	// the account as verified. Returns an error if the code is incorrect, expired,
@@ -21,14 +21,10 @@ type EmailVerificationUseCase interface {
 }
 
 // SendVerificationEmailParams holds the parameters required to send a verification email.
-type SendVerificationEmailParams struct {
-	AccountID string `json:"account_id" validate:"required"`
-}
 
 // VerifyEmailParams holds the parameters required to verify an email address.
 type VerifyEmailParams struct {
-	AccountID string `json:"account_id" validate:"required"`
-	Code      string `json:"code" validate:"required"`
+	Code string `json:"code" validate:"required"`
 }
 
 type ChangeEmailParams struct {

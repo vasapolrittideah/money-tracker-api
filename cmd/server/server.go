@@ -78,12 +78,13 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 	)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		auth_delivery.RegisterRoutes(r, authHandler, emailVerificationHandler)
+		auth_delivery.RegisterRoutes(r, authHandler)
 
 		// Protected routes that require authentication
 		r.Group(func(r chi.Router) {
 			r.Use(core_middleware.RequireAuth(jwtMaker, cfg.JWT.AccessSecretKey))
 			account_delivery.RegisterRoutes(r, accountHandler)
+			auth_delivery.RegisterProtectedRoutes(r, emailVerificationHandler)
 		})
 	})
 

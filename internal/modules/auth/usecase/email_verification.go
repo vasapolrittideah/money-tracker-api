@@ -10,8 +10,10 @@ import (
 
 	"github.com/aws/smithy-go/ptr"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
+	core_errors "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
@@ -46,8 +48,13 @@ func NewEmailVerificationUseCase(
 }
 
 // SendVerificationEmail implements [usecase.EmailVerificationUseCase].
-func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context, params *usecase.SendVerificationEmailParams) error {
-	account, err := u.accountRepo.GetAccountByID(ctx, params.AccountID)
+func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) error {
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return core_errors.ErrUnauthenticated
+	}
+
+	account, err := u.accountRepo.GetAccountByID(ctx, claims.AccountID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return auth.ErrAccountNotFound
@@ -62,12 +69,12 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context, pa
 
 	verification := &entity.EmailVerification{
 		HashedCode: hashedCode,
-		AccountID:  params.AccountID,
+		AccountID:  claims.AccountID,
 		ExpiresAt:  time.Now().Add(24 * time.Hour),
 	}
 
 	if err := u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
-		if err := u.emailVerificationRepo.InvalidateAllForAccount(ctx, params.AccountID); err != nil {
+		if err := u.emailVerificationRepo.InvalidateAllForAccount(ctx, claims.AccountID); err != nil {
 			return err
 		}
 
@@ -103,7 +110,12 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context, pa
 
 // VerifyEmail implements [usecase.EmailVerificationUseCase].
 func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usecase.VerifyEmailParams) error {
-	verification, err := u.emailVerificationRepo.GetByAccountID(ctx, params.AccountID)
+	claims, ok := middleware.ClaimsFromContext(ctx)
+	if !ok {
+		return core_errors.ErrUnauthenticated
+	}
+
+	verification, err := u.emailVerificationRepo.GetByAccountID(ctx, claims.AccountID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return auth.ErrEmailVerificationNotFound
@@ -128,7 +140,7 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 			return err
 		}
 
-		if _, err := u.accountRepo.UpdateAccount(ctx, params.AccountID, &account_repo.UpdateAccountParams{
+		if _, err := u.accountRepo.UpdateAccount(ctx, claims.AccountID, &account_repo.UpdateAccountParams{
 			Verified: ptr.Bool(true),
 		}); err != nil {
 			return err
@@ -161,9 +173,7 @@ func (u *emailVerificationUseCase) ChangeEmail(ctx context.Context, params *usec
 		return err
 	}
 
-	return u.SendVerificationEmail(ctx, &usecase.SendVerificationEmailParams{
-		AccountID: account.ID.Hex(),
-	})
+	return u.SendVerificationEmail(ctx)
 }
 
 func (u *emailVerificationUseCase) generateVerificationCode() (string, string, error) {

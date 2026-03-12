@@ -23,18 +23,7 @@ func NewEmailVerificationHandler(
 }
 
 func (h *EmailVerificationHandler) SendVerificationEmail(w http.ResponseWriter, r *http.Request) {
-	var req usecase.SendVerificationEmailParams
-	if err := utils.ReadJSON(w, r, &req); err != nil {
-		contract.WriteBadRequestResponse(w, "invalid request payload")
-		return
-	}
-
-	if errs := validator.ValidateStruct(req); errs != nil {
-		contract.WriteValidationErrorResponse(w, errs)
-		return
-	}
-
-	err := h.emailVerificationUC.SendVerificationEmail(r.Context(), &req)
+	err := h.emailVerificationUC.SendVerificationEmail(r.Context())
 	if err != nil {
 		if err == auth.ErrAccountNotFound {
 			contract.WriteNotFoundResponse(w, err.Error())
