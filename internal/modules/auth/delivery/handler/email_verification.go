@@ -5,6 +5,7 @@ import (
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/contract"
 	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/validator"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -25,6 +26,8 @@ func NewEmailVerificationHandler(
 func (h *EmailVerificationHandler) SendVerificationEmail(w http.ResponseWriter, r *http.Request) {
 	err := h.emailVerificationUC.SendVerificationEmail(r.Context())
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to send verification email")
+
 		if err == apperr.ErrAccountNotFound {
 			contract.WriteNotFoundResponse(w, err.Error())
 			return
@@ -51,6 +54,8 @@ func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Re
 
 	err := h.emailVerificationUC.VerifyEmail(r.Context(), &req)
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to verify email")
+
 		switch err {
 		case apperr.ErrEmailVerificationNotFound:
 			contract.WriteNotFoundResponse(w, err.Error())
@@ -83,6 +88,8 @@ func (h *EmailVerificationHandler) ChangeEmail(w http.ResponseWriter, r *http.Re
 
 	err := h.emailVerificationUC.ChangeEmail(r.Context(), &req)
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to change email")
+
 		switch err {
 		case apperr.ErrAccountNotFound:
 			contract.WriteNotFoundResponse(w, err.Error())

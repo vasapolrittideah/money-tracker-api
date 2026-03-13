@@ -5,6 +5,7 @@ import (
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/contract"
 	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/validator"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -36,6 +37,8 @@ func (h *AuthHandler) LoginWithEmail(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.authUC.LoginWithEmail(r.Context(), &req)
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to login with email")
+
 		if err == apperr.ErrInvalidCredentials {
 			contract.WriteUnauthorizedResponse(w, err.Error())
 			return
@@ -62,6 +65,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.authUC.Register(r.Context(), &req)
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to register account")
+
 		if err == apperr.ErrAccountAlreadyExists {
 			contract.WriteConflictResponse(w, err.Error())
 			return

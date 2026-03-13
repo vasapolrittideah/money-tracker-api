@@ -5,6 +5,7 @@ import (
 
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/contract"
 	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/usecase"
 )
 
@@ -21,6 +22,8 @@ func NewAccountHandler(accountUC usecase.AccountUseCase) *AccountHandler {
 func (h *AccountHandler) GetCurrentAccount(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accountUC.GetCurrentAccount(r.Context())
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to get current account")
+
 		if err == apperr.ErrUnauthenticated {
 			contract.WriteUnauthorizedResponse(w, err.Error())
 			return
@@ -36,6 +39,8 @@ func (h *AccountHandler) GetCurrentAccount(w http.ResponseWriter, r *http.Reques
 func (h *AccountHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accountUC.DeleteAccount(r.Context())
 	if err != nil {
+		logger.Log.Error().Err(err).Msg("failed to delete account")
+
 		if err == apperr.ErrUnauthenticated {
 			contract.WriteUnauthorizedResponse(w, err.Error())
 			return
