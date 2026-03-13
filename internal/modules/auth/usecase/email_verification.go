@@ -10,13 +10,13 @@ import (
 
 	"github.com/aws/smithy-go/ptr"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
+	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	core_errors "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -51,13 +51,13 @@ func NewEmailVerificationUseCase(
 func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) error {
 	claims, ok := middleware.ClaimsFromContext(ctx)
 	if !ok {
-		return core_errors.ErrUnauthenticated
+		return apperr.ErrUnauthenticated
 	}
 
 	account, err := u.accountRepo.GetAccountByID(ctx, claims.AccountID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return auth.ErrAccountNotFound
+			return apperr.ErrAccountNotFound
 		}
 		return err
 	}
@@ -118,21 +118,21 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 	verification, err := u.emailVerificationRepo.GetByAccountID(ctx, claims.AccountID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return auth.ErrEmailVerificationNotFound
+			return apperr.ErrEmailVerificationNotFound
 		}
 		return err
 	}
 
 	if verification.Used {
-		return auth.ErrEmailVerificationUsed
+		return apperr.ErrEmailVerificationUsed
 	}
 
 	if time.Now().After(verification.ExpiresAt) {
-		return auth.ErrEmailVerificationExpired
+		return apperr.ErrEmailVerificationExpired
 	}
 
 	if ok := u.cryptoHasher.Verify(params.Code, verification.HashedCode); !ok {
-		return auth.ErrEmailVerificationInvalid
+		return apperr.ErrEmailVerificationInvalid
 	}
 
 	return u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
@@ -153,13 +153,13 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 // ChangeEmail implements [usecase.EmailVerificationUseCase].
 func (u *emailVerificationUseCase) ChangeEmail(ctx context.Context, params *usecase.ChangeEmailParams) error {
 	if params.OldEmail == params.NewEmail {
-		return auth.ErrEmailUnchanged
+		return apperr.ErrEmailUnchanged
 	}
 
 	account, err := u.accountRepo.GetAccountByEmail(ctx, params.OldEmail)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return auth.ErrAccountNotFound
+			return apperr.ErrAccountNotFound
 		}
 		return err
 	}

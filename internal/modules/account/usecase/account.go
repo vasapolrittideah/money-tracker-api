@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
+	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/usecase"
@@ -23,7 +23,7 @@ func NewAccountUseCase(accountRepo repository.AccountRepository) usecase.Account
 func (u *accountUseCase) GetCurrentAccount(ctx context.Context) (*usecase.AccountResponse, error) {
 	claims, ok := middleware.ClaimsFromContext(ctx)
 	if !ok {
-		return nil, errors.ErrUnauthenticated
+		return nil, apperr.ErrUnauthenticated
 	}
 
 	account, err := u.accountRepo.GetAccountByID(ctx, claims.AccountID)
@@ -42,7 +42,7 @@ func (u *accountUseCase) GetCurrentAccount(ctx context.Context) (*usecase.Accoun
 func (u *accountUseCase) DeleteAccount(ctx context.Context) (*usecase.AccountResponse, error) {
 	claims, ok := middleware.ClaimsFromContext(ctx)
 	if !ok {
-		return nil, errors.ErrUnauthenticated
+		return nil, apperr.ErrUnauthenticated
 	}
 
 	account, err := u.accountRepo.DeleteAccount(ctx, claims.AccountID)

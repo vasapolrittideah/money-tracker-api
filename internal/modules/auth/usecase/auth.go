@@ -8,11 +8,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
+	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
 	account_entity "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/entity"
 	account_repo "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/domain/repository"
-	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/entity"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/repository"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -58,14 +58,14 @@ func (u *authUseCase) LoginWithEmail(ctx context.Context, params *usecase.LoginW
 	account, err := u.accountRepo.GetAccountByEmail(ctx, params.Email)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, auth.ErrInvalidCredentials
+			return nil, apperr.ErrInvalidCredentials
 		}
 
 		return nil, err
 	}
 
 	if ok := u.bcryptHasher.Verify(params.Password, account.HashedPassword); !ok {
-		return nil, auth.ErrInvalidCredentials
+		return nil, apperr.ErrInvalidCredentials
 	}
 
 	if err := u.identityRepo.UpdateLastLogin(ctx, account.ID.Hex()); err != nil {
@@ -91,7 +91,7 @@ func (u *authUseCase) Register(ctx context.Context, params *usecase.RegisterPara
 		})
 		if err != nil {
 			if mongo.IsDuplicateKeyError(err) {
-				return auth.ErrAccountAlreadyExists
+				return apperr.ErrAccountAlreadyExists
 			}
 			return err
 		}
