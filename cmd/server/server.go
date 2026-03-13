@@ -12,7 +12,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
-	core_middleware "github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
+	app_middleware "github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
 	account_delivery "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/delivery"
 	account_handler "github.com/vasapolrittideah/money-tracker-api/internal/modules/account/delivery/handler"
@@ -77,15 +77,11 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 		account_usecase.NewAccountUseCase(accountRepo),
 	)
 
-	r.Route("/api/v1", func(r chi.Router) {
-		auth_delivery.RegisterRoutes(r, authHandler)
+	authMiddleware := app_middleware.RequireAuth(jwtMaker, cfg.JWT.AccessSecretKey)
 
-		// Protected routes that require authentication
-		r.Group(func(r chi.Router) {
-			r.Use(core_middleware.RequireAuth(jwtMaker, cfg.JWT.AccessSecretKey))
-			account_delivery.RegisterRoutes(r, accountHandler)
-			auth_delivery.RegisterProtectedRoutes(r, emailVerificationHandler)
-		})
+	r.Route("/api/v1", func(r chi.Router) {
+		auth_delivery.RegisterRoutes(r, authHandler, emailVerificationHandler, authMiddleware)
+		account_delivery.RegisterRoutes(r, accountHandler, authMiddleware)
 	})
 
 	httpServer := &http.Server{
