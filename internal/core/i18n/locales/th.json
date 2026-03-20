@@ -1,0 +1,13 @@
+{
+  "ErrValidationFailed": "การตรวจสอบล้มเหลว",
+  "ErrInvalidRequestPayload": "ข้อมูลคำขอไม่ถูกต้อง",
+  "ErrUnauthenticated": "ไม่ได้รับการยืนยันตัวตน",
+  "ErrInvalidCredentials": "ข้อมูลรับรองไม่ถูกต้อง",
+  "ErrAccountNotFound": "ไม่พบบัญชี",
+  "ErrAccountAlreadyExists": "บัญชีมีอยู่แล้ว",
+  "ErrEmailVerificationNotFound": "ไม่พบการยืนยันอีเมล",
+  "ErrEmailVerificationCodeExpired": "รหัสยืนยันอีเมลหมดอายุ",
+  "ErrEmailVerificationCodeUsed": "รหัสยืนยันอีเมลถูกใช้แล้ว",
+  "ErrEmailVerificationCodeInvalid": "รหัสยืนยันอีเมลไม่ถูกต้อง",
+  "ErrEmailUnchanged": "อีเมลใหม่ต้องแตกต่างจากอีเมลเดิม"
+}

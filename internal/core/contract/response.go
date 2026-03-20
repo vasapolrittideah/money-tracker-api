@@ -73,8 +73,8 @@ func WriteErrorResponse(w http.ResponseWriter, status int, message string, detai
 }
 
 // WriteValidationErrorResponse writes a 400 Bad Request response with validation error details.
-func WriteValidationErrorResponse(w http.ResponseWriter, details []APIErrorDetail) {
-	WriteErrorResponse(w, http.StatusBadRequest, "validation failed", details)
+func WriteValidationErrorResponse(w http.ResponseWriter, message string, details []APIErrorDetail) {
+	WriteErrorResponse(w, http.StatusBadRequest, message, details)
 }
 
 // WriteNotFoundResponse writes a 404 Not Found response with the given message.

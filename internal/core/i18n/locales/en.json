@@ -1,0 +1,13 @@
+{
+  "ErrValidationFailed": "Validation failed",
+  "ErrInvalidRequestPayload": "Invalid request payload",
+  "ErrUnauthenticated": "Unauthenticated",
+  "ErrInvalidCredentials": "Invalid credentials",
+  "ErrAccountNotFound": "Account is not found",
+  "ErrAccountAlreadyExists": "Account is already exists",
+  "ErrEmailVerificationNotFound": "Email verification is not found",
+  "ErrEmailVerificationCodeExpired": "Email verification code is expired",
+  "ErrEmailVerificationCodeUsed": "Email verification code is already used",
+  "ErrEmailVerificationCodeInvalid": "Email verification code is invalid",
+  "ErrEmailUnchanged": "New email must be different from the old email"
+}

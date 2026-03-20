@@ -10,9 +10,9 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/token"
 )
 
-type contextKey string
+type jwtContextKey string
 
-const claimsContextKey contextKey = "jwt_claims"
+const claimsContextKey jwtContextKey = "jwt_claims"
 
 // RequireAuth returns a middleware that validates the Bearer JWT in the
 // Authorization header and stores the parsed claims in the request context.
