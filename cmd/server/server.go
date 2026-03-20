@@ -10,6 +10,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/config"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
+	appi18n "github.com/vasapolrittideah/money-tracker-api/internal/core/i18n"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	app_middleware "github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
@@ -35,6 +36,8 @@ type Server struct {
 // and returns a Server ready to start. It is the single place where the application's
 // dependency graph is assembled. To add a new module, wire it here.
 func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *Server {
+	appi18n.Init()
+
 	jwtMaker := token.NewJWTMaker(cfg.JWT.Issuer, cfg.JWT.Issuer)
 	bcryptHasher := hash.NewBcryptHasher(bcrypt.DefaultCost)
 	cryptoHasher := hash.NewSHA256Hasher()
@@ -51,6 +54,7 @@ func NewServer(ctx context.Context, cfg *config.Config, db *database.MongoDB) *S
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(app_middleware.I18n)
 
 	authHandler := auth_handler.NewAuthHandler(
 		auth_usecase.NewAuthUseCase(
