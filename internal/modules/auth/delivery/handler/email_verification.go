@@ -6,6 +6,7 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/contract"
 	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/logger"
+	"github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/utils"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/validator"
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
@@ -29,7 +30,7 @@ func (h *EmailVerificationHandler) SendVerificationEmail(w http.ResponseWriter, 
 		logger.Log.Error().Err(err).Msg("failed to send verification email")
 
 		if err == apperr.ErrAccountNotFound {
-			contract.WriteNotFoundResponse(w, err.Error())
+			contract.WriteNotFoundResponse(w, middleware.LocalizeError(r.Context(), err))
 			return
 		}
 
@@ -43,12 +44,12 @@ func (h *EmailVerificationHandler) SendVerificationEmail(w http.ResponseWriter, 
 func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	var req usecase.VerifyEmailParams
 	if err := utils.ReadJSON(w, r, &req); err != nil {
-		contract.WriteBadRequestResponse(w, "invalid request payload")
+		contract.WriteBadRequestResponse(w, middleware.LocalizeError(r.Context(), apperr.ErrInvalidRequestPayload))
 		return
 	}
 
 	if errs := validator.ValidateStruct(req); errs != nil {
-		contract.WriteValidationErrorResponse(w, errs)
+		contract.WriteValidationErrorResponse(w, middleware.LocalizeError(r.Context(), apperr.ErrValidationFailed), errs)
 		return
 	}
 
@@ -58,11 +59,11 @@ func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Re
 
 		switch err {
 		case apperr.ErrEmailVerificationNotFound:
-			contract.WriteNotFoundResponse(w, err.Error())
+			contract.WriteNotFoundResponse(w, middleware.LocalizeError(r.Context(), err))
 			return
 
-		case apperr.ErrEmailVerificationExpired, apperr.ErrEmailVerificationUsed, apperr.ErrEmailVerificationInvalid:
-			contract.WriteBadRequestResponse(w, err.Error())
+		case apperr.ErrEmailVerificationCodeExpired, apperr.ErrEmailVerificationCodeUsed, apperr.ErrEmailVerificationCodeInvalid:
+			contract.WriteBadRequestResponse(w, middleware.LocalizeError(r.Context(), err))
 			return
 
 		default:
@@ -77,12 +78,12 @@ func (h *EmailVerificationHandler) VerifyEmail(w http.ResponseWriter, r *http.Re
 func (h *EmailVerificationHandler) ChangeEmail(w http.ResponseWriter, r *http.Request) {
 	var req usecase.ChangeEmailParams
 	if err := utils.ReadJSON(w, r, &req); err != nil {
-		contract.WriteBadRequestResponse(w, "invalid request payload")
+		contract.WriteBadRequestResponse(w, middleware.LocalizeError(r.Context(), apperr.ErrInvalidRequestPayload))
 		return
 	}
 
 	if errs := validator.ValidateStruct(req); errs != nil {
-		contract.WriteValidationErrorResponse(w, errs)
+		contract.WriteValidationErrorResponse(w, middleware.LocalizeError(r.Context(), apperr.ErrValidationFailed), errs)
 		return
 	}
 
@@ -92,11 +93,11 @@ func (h *EmailVerificationHandler) ChangeEmail(w http.ResponseWriter, r *http.Re
 
 		switch err {
 		case apperr.ErrAccountNotFound:
-			contract.WriteNotFoundResponse(w, err.Error())
+			contract.WriteNotFoundResponse(w, middleware.LocalizeError(r.Context(), err))
 			return
 
 		case apperr.ErrEmailUnchanged:
-			contract.WriteBadRequestResponse(w, err.Error())
+			contract.WriteBadRequestResponse(w, middleware.LocalizeError(r.Context(), err))
 			return
 
 		default:

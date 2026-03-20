@@ -124,15 +124,15 @@ func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usec
 	}
 
 	if verification.Used {
-		return apperr.ErrEmailVerificationUsed
+		return apperr.ErrEmailVerificationCodeUsed
 	}
 
 	if time.Now().After(verification.ExpiresAt) {
-		return apperr.ErrEmailVerificationExpired
+		return apperr.ErrEmailVerificationCodeExpired
 	}
 
 	if ok := u.cryptoHasher.Verify(params.Code, verification.HashedCode); !ok {
-		return apperr.ErrEmailVerificationInvalid
+		return apperr.ErrEmailVerificationCodeInvalid
 	}
 
 	return u.transactor.WithTransaction(ctx, func(ctx context.Context) error {
