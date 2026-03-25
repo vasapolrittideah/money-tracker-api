@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
-	_ "embed"
+	"embed"
 	"errors"
 	"fmt"
 	"html/template"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/aws/smithy-go/ptr"
@@ -26,8 +27,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-//go:embed templates/email_verification.html
-var emailVerificationTemplate string
+//go:embed templates
+var templateFS embed.FS
 
 type emailVerificationUseCase struct {
 	accountRepo           account_repo.AccountRepository
@@ -93,7 +94,18 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) er
 		return err
 	}
 
-	tmpl, err := template.New("email_verification").Parse(emailVerificationTemplate)
+	locale := "en"
+	if strings.HasPrefix(strings.ToLower(middleware.LanguageFromContext(ctx)), "th") {
+		locale = "th"
+	}
+
+	tmplFile := fmt.Sprintf("templates/email_verification.%s.html", locale)
+	tmplContent, err := templateFS.ReadFile(tmplFile)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New("email_verification").Parse(string(tmplContent))
 	if err != nil {
 		return err
 	}
@@ -105,9 +117,13 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) er
 	}); err != nil {
 		return err
 	}
-	htmlBody := buf.String()
 
-	if err := u.mailer.SendHTML([]string{account.Email}, "Verify your email", htmlBody); err != nil {
+	subject := map[string]string{
+		"en": "Verify your email",
+		"th": "ยืนยันอีเมลของคุณ",
+	}[locale]
+
+	if err := u.mailer.SendHTML([]string{account.Email}, subject, buf.String()); err != nil {
 		return err
 	}
 
