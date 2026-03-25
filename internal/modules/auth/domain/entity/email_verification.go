@@ -6,16 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// EmailVerification represents a one-time verification record used to confirm
-// a user's email address. A new record is created each time a verification email
-// is sent to the user.
-//
-// The plain-text code is emailed to the user while only its SHA-256 hash is
-// stored in the database.
-//
-// Once the user submits the correct code, Used is set to true and the record
-// becomes invalid. Records are automatically removed by a TTL index when
-// ExpiresAt is reached.
+// EmailVerification represents a one-time record used to confirm a user's email
+// address. Only the SHA-256 hash of the code is stored; once used, the record
+// is invalidated and removed automatically by a TTL index when ExpiresAt is reached.
 type EmailVerification struct {
 	ID         bson.ObjectID `bson:"_id,omitempty"`
 	AccountID  string        `bson:"account_id"`
