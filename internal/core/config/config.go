@@ -18,8 +18,9 @@ type Config struct {
 
 // AppConfig holds general application settings.
 type AppConfig struct {
-	Port string `mapstructure:"APP_PORT"`
-	Env  string `mapstructure:"APP_ENV"`
+	Port      string `mapstructure:"APP_PORT"`
+	Env       string `mapstructure:"APP_ENV"`
+	ClientURL string `mapstructure:"APP_CLIENT_URL"`
 }
 
 // DatabaseConfig holds the connection details for the primary database.
@@ -33,11 +34,13 @@ type DatabaseConfig struct {
 
 // JWTConfig holds the secret keys and expiry durations for access and refresh tokens.
 type JWTConfig struct {
-	AccessSecretKey  string        `mapstructure:"JWT_ACCESS_SECRET"`
-	RefreshSecretKey string        `mapstructure:"JWT_REFRESH_SECRET"`
-	AccessExpiresIn  time.Duration `mapstructure:"JWT_ACCESS_EXPIRES_IN"`
-	RefreshExpiresIn time.Duration `mapstructure:"JWT_REFRESH_EXPIRES_IN"`
-	Issuer           string        `mapstructure:"JWT_ISSUER"`
+	AccessSecretKey        string        `mapstructure:"JWT_ACCESS_SECRET"`
+	RefreshSecretKey       string        `mapstructure:"JWT_REFRESH_SECRET"`
+	PasswordResetSecretKey string        `mapstructure:"JWT_PASSWORD_RESET_SECRET"`
+	AccessExpiresIn        time.Duration `mapstructure:"JWT_ACCESS_EXPIRES_IN"`
+	RefreshExpiresIn       time.Duration `mapstructure:"JWT_REFRESH_EXPIRES_IN"`
+	PasswordResetExpiresIn time.Duration `mapstructure:"JWT_PASSWORD_RESET_EXPIRES_IN"`
+	Issuer                 string        `mapstructure:"JWT_ISSUER"`
 }
 
 // SMTPConfig holds the connection details for the SMTP server used to send emails.
