@@ -1,10 +1,13 @@
 package usecase
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
+	_ "embed"
 	"errors"
 	"fmt"
+	"html/template"
 	"math/big"
 	"time"
 
@@ -22,6 +25,9 @@ import (
 	"github.com/vasapolrittideah/money-tracker-api/internal/modules/auth/domain/usecase"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
+
+//go:embed templates/email_verification.html
+var emailVerificationTemplate string
 
 type emailVerificationUseCase struct {
 	accountRepo           account_repo.AccountRepository
@@ -87,19 +93,19 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) er
 		return err
 	}
 
-	htmlBody := fmt.Sprintf(`
-	<p>Hi,</p>
-	<p>Thank you for registering with Money Tracker!</p>
-	<p>Please use the verification code below to verify your email address:</p>
+	tmpl, err := template.New("email_verification").Parse(emailVerificationTemplate)
+	if err != nil {
+		return err
+	}
 
-	<h2 style="letter-spacing: 8px; font-size: 32px; text-align: center; color: #7D52F4;">%s</h2>
-
-	<p>This code will expire in <strong>%s</strong>.</p>
-	<p>If you did not create an account, you can safely ignore this email.</p>
-
-	<p>Thank you,</p>
-	<p>Money Tracker Team</p>
-	`, code, utils.FormatDuration(time.Until(verification.ExpiresAt)))
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, map[string]string{
+		"Code":      code,
+		"ExpiresIn": utils.FormatDuration(time.Until(verification.ExpiresAt)),
+	}); err != nil {
+		return err
+	}
+	htmlBody := buf.String()
 
 	if err := u.mailer.SendHTML([]string{account.Email}, "Verify your email", htmlBody); err != nil {
 		return err
