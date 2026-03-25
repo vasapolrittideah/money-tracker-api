@@ -15,7 +15,6 @@ import (
 	"github.com/aws/smithy-go/ptr"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/database"
 	apperr "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
-	core_errors "github.com/vasapolrittideah/money-tracker-api/internal/core/errors"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/hash"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/mailer"
 	"github.com/vasapolrittideah/money-tracker-api/internal/core/middleware"
@@ -28,7 +27,7 @@ import (
 )
 
 //go:embed templates
-var templateFS embed.FS
+var emailVerificationTemplateFS embed.FS
 
 type emailVerificationUseCase struct {
 	accountRepo           account_repo.AccountRepository
@@ -100,7 +99,7 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) er
 	}
 
 	tmplFile := fmt.Sprintf("templates/email_verification.%s.html", locale)
-	tmplContent, err := templateFS.ReadFile(tmplFile)
+	tmplContent, err := emailVerificationTemplateFS.ReadFile(tmplFile)
 	if err != nil {
 		return err
 	}
@@ -134,7 +133,7 @@ func (u *emailVerificationUseCase) SendVerificationEmail(ctx context.Context) er
 func (u *emailVerificationUseCase) VerifyEmail(ctx context.Context, params *usecase.VerifyEmailParams) error {
 	claims, ok := middleware.ClaimsFromContext(ctx)
 	if !ok {
-		return core_errors.ErrUnauthenticated
+		return apperr.ErrUnauthenticated
 	}
 
 	verification, err := u.emailVerificationRepo.GetByAccountID(ctx, claims.AccountID)
