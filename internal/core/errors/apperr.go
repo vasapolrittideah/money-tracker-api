@@ -17,4 +17,9 @@ var (
 	ErrEmailVerificationCodeUsed    = errors.New("ErrEmailVerificationCodeUsed")
 	ErrEmailVerificationCodeInvalid = errors.New("ErrEmailVerificationCodeInvalid")
 	ErrEmailUnchanged               = errors.New("ErrEmailUnchanged")
+
+	ErrPasswordResetTokenNotFound = errors.New("ErrPasswordResetTokenNotFound")
+	ErrPasswordResetTokenExpired  = errors.New("ErrPasswordResetTokenExpired")
+	ErrPasswordResetTokenUsed     = errors.New("ErrPasswordResetTokenUsed")
+	ErrPasswordUnchanged          = errors.New("ErrPasswordUnchanged")
 )
