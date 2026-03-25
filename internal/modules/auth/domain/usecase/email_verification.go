@@ -20,8 +20,6 @@ type EmailVerificationUseCase interface {
 	ChangeEmail(ctx context.Context, params *ChangeEmailParams) error
 }
 
-// SendVerificationEmailParams holds the parameters required to send a verification email.
-
 // VerifyEmailParams holds the parameters required to verify an email address.
 type VerifyEmailParams struct {
 	Code string `json:"code" validate:"required"`
