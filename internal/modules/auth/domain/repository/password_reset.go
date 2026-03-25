@@ -10,7 +10,7 @@ import (
 type PasswordResetRepository interface {
 	// Create creates a new PasswordReset record for the given account and returns
 	// the signed reset token string.
-	Create(ctx context.Context, passwordReset *entity.PasswordReset) (string, error)
+	Create(ctx context.Context, passwordReset *entity.PasswordReset) (*entity.PasswordReset, error)
 
 	// GetByJTI retrieves the PasswordReset record identified by the given JWT ID.
 	GetByJTI(ctx context.Context, jti string) (*entity.PasswordReset, error)
